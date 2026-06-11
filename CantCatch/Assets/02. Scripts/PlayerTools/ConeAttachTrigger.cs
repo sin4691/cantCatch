@@ -12,16 +12,22 @@ public class ConeAttachTrigger : MonoBehaviour
     private void Awake()
     {
         if (stickController == null)
+        {
             stickController = GetComponentInParent<StickIceCreamController>();
+        }
+
+        if (stickController == null)
+        {
+            Debug.LogError("막대기 컨트롤러를 찾을 수 없습니다.", this);
+            enabled = false;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        ConeBox coneBox = other.GetComponentInParent<ConeBox>();
-
-        if (coneBox == null)
+        if (!other.gameObject.CompareTag("ConeBox"))
             return;
 
-        stickController.AttachCone();
+        stickController.TryAttachCone();
     }
 }

@@ -128,7 +128,7 @@ namespace HyTeKGames.SRPMaterialConverter
             GL.LoadPixelMatrix(0, 1, 1, 0);
             GL.Clear(true, true, new Color(0, 0, 0, 0));
             Graphics.DrawTexture(new Rect(0, 0, 1, 1), src);
-            
+
             // Clean up RenderTexture to prevent memory leak
             RenderTexture.active = null;
             rtt.Release();
@@ -227,7 +227,7 @@ namespace HyTeKGames.SRPMaterialConverter
             }
             ParsedMaterial parsedMat = new ParsedMaterial();
             parsedMat.gpuInstancing = mat.enableInstancing;
-            string[] lines = content.Split("\n");
+            string[] lines = content.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
 
             // Parse value m_TexEnvs
             int texEnvsIndex = Array.FindIndex(lines, line => line.Contains("m_TexEnvs:"));
@@ -239,7 +239,11 @@ namespace HyTeKGames.SRPMaterialConverter
                     string lineContent = lines[subLine];
                     if (lineContent.StartsWith("    -"))
                     {
-                        lastParent = lineContent.Remove(0, "    - ".Length).TrimEnd(':');
+                        lastParent = lineContent
+                        .Remove(0, "    - ".Length)
+                        .Trim()
+                        .TrimEnd(':')
+                        .Trim();
                         ParsedTexture parsedTex = new ParsedTexture();
                         Texture tex = mat.GetTexture(lastParent);
                         if (tex)

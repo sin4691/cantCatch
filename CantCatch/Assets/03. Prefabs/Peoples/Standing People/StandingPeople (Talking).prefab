@@ -14760,7 +14760,7 @@ GameObject:
   - component: {fileID: 1443960956042074553}
   - component: {fileID: 3694848134441339345}
   m_Layer: 0
-  m_Name: SeatingPeople (Basic)
+  m_Name: StandingPeople (Talking)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14793,7 +14793,7 @@ Animator:
   m_GameObject: {fileID: 7620271021023955913}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: a4a3ba617ed9c5946bb76844ec1ef299, type: 3}
-  m_Controller: {fileID: 9100000, guid: 46934ef4841c55c49ac5cf4c5bd73710, type: 2}
+  m_Controller: {fileID: 9100000, guid: 24f3a8901c6ba27469d2565a77e19e12, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

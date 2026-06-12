@@ -210,9 +210,9 @@ MonoBehaviour:
   grabInteractable: {fileID: 7810448860086964349}
   skillVisualRoot: {fileID: 4996323947080339886}
   rotationSkillAxis: {x: 0, y: 1, z: 0}
-  iceCreamPrefab: {fileID: 5232609224914997382, guid: e59100d60abbe3548aa35c8f0b894c96, type: 3}
+  iceCreamPrefab: {fileID: 7301043778394201591, guid: 687308a95f77d4b459a4ab42dfce7843, type: 3}
   iceCreamAttachPoint: {fileID: 5607412029066975867}
-  conePrefab: {fileID: 3697696661320050074, guid: f2d4b4823b6a36744843980272a0d1c3, type: 3}
+  conePrefab: {fileID: 6524277618742970776, guid: 0c3899d526830d241a147760e706d32e, type: 3}
   coneAttachPoint: {fileID: 2264433088253984209}
 --- !u!1 &1694442887382493104
 GameObject:

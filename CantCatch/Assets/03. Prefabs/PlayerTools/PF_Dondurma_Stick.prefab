@@ -207,6 +207,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 502915d37c70bf349aa987850b59bce6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StickIceCreamController
+  grabInteractable: {fileID: 7810448860086964349}
+  skillVisualRoot: {fileID: 4996323947080339886}
+  rotationSkillAxis: {x: 0, y: 1, z: 0}
   iceCreamPrefab: {fileID: 5232609224914997382, guid: e59100d60abbe3548aa35c8f0b894c96, type: 3}
   iceCreamAttachPoint: {fileID: 5607412029066975867}
   conePrefab: {fileID: 3697696661320050074, guid: f2d4b4823b6a36744843980272a0d1c3, type: 3}
@@ -370,13 +373,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2729787533718617683}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0.873, z: 0.1259}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1727144823513366106}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1 &3680512600732776756
 GameObject:
   m_ObjectHideFlags: 0
@@ -500,13 +503,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5508941359874180477}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0.873, z: 0.0295}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1727144823513366106}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1 &5819550694916913760
 GameObject:
   m_ObjectHideFlags: 0

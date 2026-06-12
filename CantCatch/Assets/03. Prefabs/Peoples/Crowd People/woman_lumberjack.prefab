@@ -11077,7 +11077,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1002468870918585936
 Transform:
   m_ObjectHideFlags: 0
@@ -14758,9 +14758,10 @@ GameObject:
   - component: {fileID: 4952115777352708583}
   - component: {fileID: 1097640102674809782}
   - component: {fileID: 1443960956042074553}
-  - component: {fileID: 3694848134441339345}
+  - component: {fileID: 2147501163821543058}
+  - component: {fileID: 1198642918724399034}
   m_Layer: 0
-  m_Name: SeatingPeople (Basic)
+  m_Name: woman_lumberjack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14774,7 +14775,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7620271021023955913}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -14793,7 +14794,7 @@ Animator:
   m_GameObject: {fileID: 7620271021023955913}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: a4a3ba617ed9c5946bb76844ec1ef299, type: 3}
-  m_Controller: {fileID: 9100000, guid: 46934ef4841c55c49ac5cf4c5bd73710, type: 2}
+  m_Controller: {fileID: 9100000, guid: b2bb54d2c5cb44a408805fa3b2006c61, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -14830,7 +14831,29 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.99, z: 0}
---- !u!114 &3694848134441339345
+--- !u!195 &2147501163821543058
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7620271021023955913}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.19
+  m_Speed: 1.2
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: -0.1
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &1198642918724399034
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -14839,13 +14862,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 7620271021023955913}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d2563c09e4b1fa438d81fd64309e2f1, type: 3}
+  m_Script: {fileID: 11500000, guid: 7342d67ac4d645809fa4bc060184d672, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleActionController
-  animator: {fileID: 1097640102674809782}
-  triggerName: DoAction
-  minIdleLoops: 2
-  maxIdleLoops: 4
+  m_EditorClassIdentifier: Assembly-CSharp::PolyPerfect.CrowdPatrolAgent
+  waypointGroup: {fileID: 0}
+  randomizeStartingWaypoint: 1
+  walkAnimationBool: isWalking
+  textingAnimationBool: isTexting
+  callingAnimationBool: isCalling
+  arrivalDistance: 0.35
+  idleDurationMin: 1.5
+  idleDurationMax: 3
+  idleIntervalMin: 30
+  idleIntervalMax: 40
+  idleWeight: 5
+  textingWeight: 1
+  callingWeight: 1
 --- !u!1 &7635503775293527784
 GameObject:
   m_ObjectHideFlags: 0
@@ -16544,7 +16576,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4121313890548890790
 Transform:
   m_ObjectHideFlags: 0

@@ -6,8 +6,6 @@ public class CustomerArmIK : MonoBehaviour
     [Header("References")]
     [SerializeField] private LimbIK limbIK;
     [SerializeField] private Transform ikTarget;
-
-    [Header("References")]
     [SerializeField] private GameFlowManager gameFlowManager;
 
     [Header("Tracking Speed")]
@@ -55,6 +53,7 @@ public class CustomerArmIK : MonoBehaviour
         float currentSpeed = Mathf.Lerp(speed, speedAtEnd, timeRatio);
 
         ikTarget.position = Vector3.MoveTowards(ikTarget.position, clampedTarget, currentSpeed * Time.deltaTime);
+
     }
 
     private Vector3 ClampTarget(Vector3 worldTarget)
@@ -78,7 +77,7 @@ public class CustomerArmIK : MonoBehaviour
         return transform.TransformPoint(localTarget);
     }
 
-    private void SetIKActive(bool active)
+    public void SetIKActive(bool active)
     {
         if (limbIK != null)
             limbIK.enabled = active;

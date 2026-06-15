@@ -8,4 +8,9 @@ public class AttachedCone : MonoBehaviour
     {
         Stick = stick;
     }
+
+    public void Detach()
+    {
+        Stick = null;
+    }
 }

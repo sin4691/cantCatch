@@ -226,16 +226,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f12af012d31d4f4eae31064b38d2f0ce, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillController
   skillInputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  skillActionMapName: Player
-  coneSkillActionName: Attack
-  rotationSkillActionName: RotateSkill
-  faceSkillActionName: FaceSkill
-  singleConeQteController: {fileID: 0}
+  qteSubmitActionReference: {fileID: 1120369429361536294, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  rotationSkillActionReference: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  faceSkillActionReference: {fileID: 4041946305653837453, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  singleConeQteController: {fileID: 4761802713825229481, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
   stickController: {fileID: 3785382683682809803}
-  gameFlowManager: {fileID: 0}
+  gameFlowManager: {fileID: 8305621126413376351, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
   rotationHoldDuration: 1
   rotationSkillCooldown: 1
   maxFaceSkillUses: 2
@@ -252,10 +251,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b520a5de75194037bf47a37e05842da9, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StickPreparationController
   stickController: {fileID: 3785382683682809803}
-  gameFlowManager: {fileID: 0}
+  gameFlowManager: {fileID: 8305621126413376351, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
 --- !u!1 &1694442887382493104
 GameObject:
   m_ObjectHideFlags: 0

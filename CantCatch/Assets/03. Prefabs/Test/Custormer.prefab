@@ -411,6 +411,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8292090977792707433}
   - component: {fileID: 3871089745618450316}
+  - component: {fileID: 9200000000000000001}
   m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
@@ -454,6 +455,19 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &9200000000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5935611891536520993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa280bbd485f45a7835d19dacb83d690, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerFaceTrigger
+  slowController: {fileID: 9200000000000000002}
 --- !u!1 &5951297628573603161
 GameObject:
   m_ObjectHideFlags: 0
@@ -611,6 +625,7 @@ GameObject:
   - component: {fileID: 5979809671070549286}
   - component: {fileID: 5930777732699877030}
   - component: {fileID: 7100000000000000001}
+  - component: {fileID: 9200000000000000002}
   m_Layer: 0
   m_Name: Custormer
   m_TagString: Untagged
@@ -756,15 +771,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerHandSensor
   gameFlowManager: {fileID: 8305621126413376351, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
+  singleConeQteController: {fileID: 4761802713825229481, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
   coneReceivePoint: {fileID: 3814896419951143917}
-  skillInputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  skillActionMapName: Player
-  coneSkillActionName: Attack
-  rotationSkillActionName: RotateSkill
   nearScoreInterval: 1
   nearScorePerInterval: 1
-  skillInputWindow: 1
-  coneSkillCooldown: 5
-  coneSkillSuccessScore: 10
-  rotationHoldDuration: 1
-  rotationSkillCooldown: 3
+--- !u!114 &9200000000000000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8367832248685072534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dc5da2c80de47189f24b4e6c532bb06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerSlowController

@@ -5,10 +5,9 @@ public class PlayerSkillController : MonoBehaviour
 {
     [Header("Input")]
     [SerializeField] private InputActionAsset skillInputActions;
-    [SerializeField] private string skillActionMapName = "Player";
-    [SerializeField] private string coneSkillActionName = "Attack";
-    [SerializeField] private string rotationSkillActionName = "RotateSkill";
-    [SerializeField] private string faceSkillActionName = "FaceSkill";
+    [SerializeField] private InputActionReference qteSubmitActionReference;
+    [SerializeField] private InputActionReference rotationSkillActionReference;
+    [SerializeField] private InputActionReference faceSkillActionReference;
 
     [Header("Skill Target")]
     [SerializeField] private SingleConeQteController singleConeQteController;
@@ -35,6 +34,10 @@ public class PlayerSkillController : MonoBehaviour
     private bool enabledFaceSkillAction;
     private EGameState previousGameState = EGameState.Idle;
 
+    private const string QteSubmitActionPath = "Player/QteSubmit";
+    private const string RotationSkillActionPath = "Player/RotateSkill";
+    private const string FaceSkillActionPath = "Player/FaceSkill";
+
     public float RotationCooldownRemaining => rotationCooldownRemaining;
     public float FaceCooldownRemaining => faceCooldownRemaining;
     public int FaceSkillUsesRemaining { get; private set; }
@@ -60,16 +63,30 @@ public class PlayerSkillController : MonoBehaviour
         if (singleConeQteController == null && gameFlowManager != null)
             singleConeQteController = gameFlowManager.GetComponent<SingleConeQteController>();
 
-        if (skillInputActions == null)
+        if (gameFlowManager == null)
         {
-            Debug.LogError("플레이어 스킬 입력 액션 에셋이 연결되지 않았습니다.", this);
-            enabled = false;
-            return;
+            Debug.LogError("GameFlowManager.Instance를 찾을 수 없습니다.", this);
+            isValid = false;
         }
 
-        coneSkillAction = FindSkillAction(coneSkillActionName, ref isValid);
-        rotationSkillAction = FindSkillAction(rotationSkillActionName, ref isValid);
-        faceSkillAction = FindSkillAction(faceSkillActionName, ref isValid);
+        if (singleConeQteController == null)
+        {
+            Debug.LogError("SingleConeQteController를 찾을 수 없습니다. GameFlowManager 오브젝트에 SingleConeQteController를 추가하세요.", this);
+            isValid = false;
+        }
+
+        coneSkillAction = ResolveSkillAction(
+            qteSubmitActionReference,
+            QteSubmitActionPath,
+            ref isValid);
+        rotationSkillAction = ResolveSkillAction(
+            rotationSkillActionReference,
+            RotationSkillActionPath,
+            ref isValid);
+        faceSkillAction = ResolveSkillAction(
+            faceSkillActionReference,
+            FaceSkillActionPath,
+            ref isValid);
         FaceSkillUsesRemaining = maxFaceSkillUses;
         enabled = isValid;
     }
@@ -92,16 +109,19 @@ public class PlayerSkillController : MonoBehaviour
         }
     }
 
-    private InputAction FindSkillAction(string actionName, ref bool isValid)
+    private InputAction ResolveSkillAction(
+        InputActionReference actionReference,
+        string fallbackActionPath,
+        ref bool isValid)
     {
-        InputAction action = skillInputActions.FindAction(
-            $"{skillActionMapName}/{actionName}",
-            false);
+        InputAction action = actionReference != null
+            ? actionReference.action
+            : skillInputActions?.FindAction(fallbackActionPath, false);
 
         if (action == null)
         {
             Debug.LogError(
-                $"플레이어 스킬 입력 액션을 찾을 수 없습니다: {skillActionMapName}/{actionName}",
+                $"플레이어 스킬 입력 액션을 찾을 수 없습니다: {fallbackActionPath}",
                 this);
             isValid = false;
         }

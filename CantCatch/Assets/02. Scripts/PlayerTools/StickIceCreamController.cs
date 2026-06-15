@@ -19,6 +19,7 @@ public class StickIceCreamController : MonoBehaviour
     [SerializeField] private Transform coneAttachPoint;
 
     private GameObject currentIceCream;
+    private AttachedIceCream attachedIceCream;
     private GameObject currentCone;
     private Coroutine rotationSkillRoutine;
     private Quaternion visualOriginalRotation;
@@ -64,6 +65,12 @@ public class StickIceCreamController : MonoBehaviour
             return false;
 
         currentIceCream = InstantiateAttached(iceCreamPrefab, iceCreamAttachPoint);
+        attachedIceCream = currentIceCream.GetComponent<AttachedIceCream>();
+
+        if (attachedIceCream == null)
+            attachedIceCream = currentIceCream.AddComponent<AttachedIceCream>();
+
+        attachedIceCream.Initialize(this);
         NotifyServingStateChanged();
 
         Debug.Log("막대기에 아이스크림 생성");
@@ -89,6 +96,8 @@ public class StickIceCreamController : MonoBehaviour
         if (!isConfigured || !HasCone || receivePoint == null)
             return false;
 
+        AttachedCone attachedCone = currentCone.GetComponent<AttachedCone>();
+        attachedCone.Detach();
         SetCollidersEnabled(currentCone, false);
         currentCone.transform.SetParent(receivePoint, false);
         currentCone.transform.localPosition = Vector3.zero;
@@ -111,6 +120,15 @@ public class StickIceCreamController : MonoBehaviour
         return true;
     }
 
+    public bool TryGetFaceSkillTarget(out CustomerSlowController target)
+    {
+        if (attachedIceCream != null && attachedIceCream.TryGetFaceTarget(out target))
+            return true;
+
+        target = null;
+        return false;
+    }
+
     public void Clear()
     {
         bool hadServing = HasIceCream || HasCone;
@@ -119,6 +137,7 @@ public class StickIceCreamController : MonoBehaviour
         {
             Destroy(currentIceCream);
             currentIceCream = null;
+            attachedIceCream = null;
         }
 
         if (currentCone != null)

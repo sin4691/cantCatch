@@ -5,6 +5,7 @@ public class CustomerHandSensor : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private GameFlowManager gameFlowManager;
+    [SerializeField] private TimingGame timingGame;
     [SerializeField] private Transform coneReceivePoint;
 
     [Header("Near Score")]
@@ -122,6 +123,8 @@ public class CustomerHandSensor : MonoBehaviour
         pendingCone = cone;
         skillTimeRemaining = skillInputWindow;
         isSkillWindowOpen = true;
+
+        timingGame?.StartTimingGame(cone);
 
         Debug.Log($"스킬 입력 시작: {skillInputWindow:0.##}초", this);
     }
@@ -245,6 +248,8 @@ public class CustomerHandSensor : MonoBehaviour
         pendingCone = null;
         skillTimeRemaining = 0f;
         isSkillWindowOpen = false;
+
+        timingGame?.StopTimingGame();
     }
 
     private Dictionary<AttachedCone, int> GetContacts(CustomerHandZoneType zoneType)

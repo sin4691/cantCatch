@@ -1792,6 +1792,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7187285798164016683}
+  - {fileID: 8352150334742464543}
   m_Father: {fileID: 2889938539828989241}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &943302586872757974
@@ -5629,11 +5630,9 @@ GameObject:
   - component: {fileID: 8141950007923886842}
   - component: {fileID: 3025472583259044177}
   - component: {fileID: 7641303770771572714}
-  - component: {fileID: 79740944220972724}
   - component: {fileID: 7929019463200935181}
   - component: {fileID: 8277544790450440712}
   - component: {fileID: 5606215029986431500}
-  - component: {fileID: 7774795171195893565}
   m_Layer: 0
   m_Name: CustormerV2
   m_TagString: Untagged
@@ -5727,77 +5726,6 @@ NavMeshAgent:
   m_BaseOffset: -0.1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &79740944220972724
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2443524490154100196}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9207ee96ce6bd8e40b87d68769cd7432, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  idleStates:
-  - stateName: Waving
-    animationBool: isWaving
-    minStateTime: 0
-    maxStateTime: 29
-    stateWeight: 1
-  - stateName: Texting
-    animationBool: isTexting
-    minStateTime: 0
-    maxStateTime: 100
-    stateWeight: 0
-  movementStates:
-  - stateName: Walking
-    animationBool: isWalking
-    maxStateTime: 40
-    moveSpeed: 1
-    turnSpeed: 120
-  - stateName: Running
-    animationBool: isRunning
-    maxStateTime: 20
-    moveSpeed: 4
-    turnSpeed: 120
-  attackingStates:
-  - stateName: 'Punch Left '
-    animationBool: isPunching_Left
-  - stateName: Punch Right
-    animationBool: isPunching_Right
-  - stateName: Kicking
-    animationBool: isKicking
-  deathStates:
-  - stateName: Dead
-    animationBool: isDead
-  species: Human
-  stats: {fileID: 11400000, guid: df9751c3f50884146ba79d1e58dd1354, type: 2}
-  wanderZone: 10
-  awareness: 30
-  scent: 30
-  constainedToWanderZone: 0
-  nonAgressiveTowards: []
-  matchSurfaceRotation: 0
-  surfaceRotationSpeed: 2
-  logChanges: 0
-  showGizmos: 0
-  drawWanderRange: 1
-  drawScentRange: 1
-  drawAwarenessRange: 1
-  deathEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  attackingEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  idleEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  movementEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  CurrentState: 0
 --- !u!114 &7929019463200935181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5812,7 +5740,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CustomerHandSensor
   gameFlowManager: {fileID: 0}
   coneReceivePoint: {fileID: 7187285798164016683}
-  skillInputActions: {fileID: 0}
+  skillInputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   skillActionMapName: Player
   coneSkillActionName: Attack
   rotationSkillActionName: RotateSkill
@@ -5857,27 +5785,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CustomerArmIK
   limbIK: {fileID: 119422147854971410}
   ikTarget: {fileID: 0}
-  minSpeed: 1
-  maxSpeed: 5
-  maxReach: 0.7
+  gameFlowManager: {fileID: 0}
+  speed: 1
+  speedAtEnd: 3
+  maxReach: 3
   forwardOffset: 0.3
---- !u!114 &7774795171195893565
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2443524490154100196}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51578b43440dd6a4eb7b2029c55cfd80, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CustomerBodyTracker
-  body: {fileID: 7829095646469252672}
-  armIK: {fileID: 5606215029986431500}
-  moveSpeed: 0.5
-  maxDistance: 0.5
-  reachThreshold: 0.7
 --- !u!1 &2554737292045614768
 GameObject:
   m_ObjectHideFlags: 0
@@ -9549,7 +9461,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerHandZone
   zoneType: 0
-  handSensor: {fileID: 0}
+  handSensor: {fileID: 7929019463200935181}
 --- !u!1 &4500594017889918760
 GameObject:
   m_ObjectHideFlags: 0
@@ -14078,6 +13990,133 @@ Transform:
   - {fileID: 3625762161219811772}
   m_Father: {fileID: 7492515664753545573}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6973107385523809087
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8352150334742464543}
+  - component: {fileID: 2293407587144898458}
+  - component: {fileID: 1822714723100248740}
+  - component: {fileID: 3206913346721588607}
+  - component: {fileID: 7920096171325662322}
+  m_Layer: 0
+  m_Name: HandReceiveZone_Right
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8352150334742464543
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6973107385523809087}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.62610185, y: -0.18910809, z: -0.18568721, w: 0.7333178}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3877371091084537331}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &2293407587144898458
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6973107385523809087}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &1822714723100248740
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6973107385523809087}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: a3b0f2cb4b660d34d8696bdb731577b9, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!135 &3206913346721588607
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6973107385523809087}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7920096171325662322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6973107385523809087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f21a6a7c6e84a4498533030aa50261a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerHandZone
+  zoneType: 1
+  handSensor: {fileID: 7929019463200935181}
 --- !u!1 &7076595387769319115
 GameObject:
   m_ObjectHideFlags: 0
@@ -18607,13 +18646,13 @@ MonoBehaviour:
   fixTransforms: 1
   solver:
     executedInEditor: 0
-    IKPosition: {x: -32.37949, y: 3.3755848, z: -25.417282}
+    IKPosition: {x: -32.690292, y: 3.3755856, z: -25.938633}
     IKPositionWeight: 1
     root: {fileID: 6707445776805464888}
     target: {fileID: 0}
     IKRotationWeight: 0
     IKRotation: {x: -0.6990869, y: -0.10442805, z: 0.016346842, w: 0.707181}
-    bendNormal: {x: 0.0012508127, y: -0.021507164, z: 0.011649375}
+    bendNormal: {x: 0.0012508156, y: -0.021507248, z: 0.011649314}
     bone1:
       transform: {fileID: 8560053115028875468}
       weight: 1

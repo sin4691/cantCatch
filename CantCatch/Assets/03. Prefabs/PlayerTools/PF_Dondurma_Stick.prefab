@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: -6316976964240310927}
   - component: {fileID: 7810448860086964349}
   - component: {fileID: 3785382683682809803}
+  - component: {fileID: 6943352819674549731}
+  - component: {fileID: 3195117089910287564}
   m_Layer: 0
   m_Name: PF_Dondurma_Stick
   m_TagString: Untagged
@@ -214,6 +216,40 @@ MonoBehaviour:
   iceCreamAttachPoint: {fileID: 5607412029066975867}
   conePrefab: {fileID: 6524277618742970776, guid: 164f51a71d5b18d45b1afa58969ff9c4, type: 3}
   coneAttachPoint: {fileID: 2264433088253984209}
+--- !u!114 &6943352819674549731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846633547081268363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f12af012d31d4f4eae31064b38d2f0ce, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillController
+  skillInputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  skillActionMapName: Player
+  coneSkillActionName: Attack
+  rotationSkillActionName: RotateSkill
+  handSensor: {fileID: 0}
+  stickController: {fileID: 3785382683682809803}
+  rotationHoldDuration: 1
+  rotationSkillCooldown: 1
+--- !u!114 &3195117089910287564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846633547081268363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b520a5de75194037bf47a37e05842da9, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::StickPreparationController
+  stickController: {fileID: 3785382683682809803}
+  gameFlowManager: {fileID: 0}
 --- !u!1 &1694442887382493104
 GameObject:
   m_ObjectHideFlags: 0

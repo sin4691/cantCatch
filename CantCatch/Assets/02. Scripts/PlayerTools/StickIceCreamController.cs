@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using Action = System.Action;
 
 public class StickIceCreamController : MonoBehaviour
 {
@@ -29,10 +30,13 @@ public class StickIceCreamController : MonoBehaviour
 
     public bool HasIceCream => currentIceCream != null;
     public bool HasCone => currentCone != null;
+    public bool HasCompleteServing => HasIceCream && HasCone;
     public bool IsHeldWithTwoHands =>
         grabInteractable != null &&
         grabInteractable.interactorsSelecting.Count >= 2;
     public bool IsRotationSkillActive => rotationSkillRoutine != null;
+
+    public event Action ServingStateChanged;
 
     private void Awake()
     {
@@ -60,6 +64,7 @@ public class StickIceCreamController : MonoBehaviour
             return false;
 
         currentIceCream = InstantiateAttached(iceCreamPrefab, iceCreamAttachPoint);
+        NotifyServingStateChanged();
 
         Debug.Log("막대기에 아이스크림 생성");
         return true;
@@ -73,6 +78,7 @@ public class StickIceCreamController : MonoBehaviour
         currentCone = InstantiateAttached(conePrefab, coneAttachPoint);
         AttachedCone attachedCone = currentCone.GetComponent<AttachedCone>();
         attachedCone.Initialize(this);
+        NotifyServingStateChanged();
 
         Debug.Log("아이스크림에 콘 생성");
         return true;
@@ -88,6 +94,7 @@ public class StickIceCreamController : MonoBehaviour
         currentCone.transform.localPosition = Vector3.zero;
         currentCone.transform.localRotation = Quaternion.identity;
         currentCone = null;
+        NotifyServingStateChanged();
 
         Debug.Log("손님 손 위치에 콘만 남김");
         return true;
@@ -95,8 +102,7 @@ public class StickIceCreamController : MonoBehaviour
 
     public bool TryRotateServing(float holdDuration)
     {
-        if (!isConfigured || !HasIceCream || !HasCone ||
-            IsRotationSkillActive || holdDuration <= 0f)
+        if (!isConfigured || IsRotationSkillActive || holdDuration <= 0f)
         {
             return false;
         }
@@ -107,6 +113,8 @@ public class StickIceCreamController : MonoBehaviour
 
     public void Clear()
     {
+        bool hadServing = HasIceCream || HasCone;
+
         if (currentIceCream != null)
         {
             Destroy(currentIceCream);
@@ -118,6 +126,16 @@ public class StickIceCreamController : MonoBehaviour
             Destroy(currentCone);
             currentCone = null;
         }
+
+        if (hadServing)
+        {
+            NotifyServingStateChanged();
+        }
+    }
+
+    private void NotifyServingStateChanged()
+    {
+        ServingStateChanged?.Invoke();
     }
 
     private GameObject InstantiateAttached(GameObject prefab, Transform attachPoint)

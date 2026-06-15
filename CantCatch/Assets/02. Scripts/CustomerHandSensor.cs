@@ -1,16 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class CustomerHandSensor : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private GameFlowManager gameFlowManager;
     [SerializeField] private Transform coneReceivePoint;
-    [SerializeField] private InputActionAsset skillInputActions;
-    [SerializeField] private string skillActionMapName = "Player";
-    [SerializeField] private string coneSkillActionName = "Attack";
-    [SerializeField] private string rotationSkillActionName = "RotateSkill";
 
     [Header("Near Score")]
     [SerializeField, Min(0.01f)] private float nearScoreInterval = 1f;
@@ -23,32 +18,22 @@ public class CustomerHandSensor : MonoBehaviour
     [SerializeField, Min(0f)] private float coneSkillCooldown = 5f;
     [SerializeField, Min(1)] private int coneSkillSuccessScore = 10;
 
-    [Header("180 Rotation Skill")]
-    [SerializeField, Min(0.01f)] private float rotationHoldDuration = 1f;
-    [SerializeField, Min(0f)] private float rotationSkillCooldown = 3f;
-
     private readonly Dictionary<AttachedCone, int> nearContacts = new();
     private readonly Dictionary<AttachedCone, int> receiveContacts = new();
     private readonly List<AttachedCone> invalidCones = new();
 
-    private InputAction coneSkillAction;
-    private InputAction rotationSkillAction;
     private AttachedCone pendingCone;
     private StickIceCreamController waitingStick;
     private float nearScoreTimer;
     private float skillTimeRemaining;
     private float coneCooldownRemaining;
-    private float rotationCooldownRemaining;
     private bool isSkillWindowOpen;
-    private bool enabledConeSkillAction;
-    private bool enabledRotationSkillAction;
 
     public bool HasConeInReceiveZone => receiveContacts.Count > 0;
     public bool IsSkillWindowOpen => isSkillWindowOpen;
     public bool IsWaitingForCone => waitingStick != null && !waitingStick.HasCone;
     public float SkillTimeRemaining => skillTimeRemaining;
     public float ConeCooldownRemaining => coneCooldownRemaining;
-    public float RotationCooldownRemaining => rotationCooldownRemaining;
 
     private void Awake()
     {
@@ -71,58 +56,7 @@ public class CustomerHandSensor : MonoBehaviour
             isValid = false;
         }
 
-        if (skillInputActions == null)
-        {
-            Debug.LogError("스킬 입력 액션 에셋이 연결되지 않았습니다.", this);
-            isValid = false;
-        }
-        else
-        {
-            coneSkillAction = FindSkillAction(coneSkillActionName, ref isValid);
-            rotationSkillAction = FindSkillAction(rotationSkillActionName, ref isValid);
-        }
-
         enabled = isValid;
-    }
-
-    private InputAction FindSkillAction(string actionName, ref bool isValid)
-    {
-        InputAction action = skillInputActions.FindAction(
-            $"{skillActionMapName}/{actionName}",
-            false);
-
-        if (action == null)
-        {
-            Debug.LogError(
-                $"스킬 입력 액션을 찾을 수 없습니다: {skillActionMapName}/{actionName}",
-                this);
-            isValid = false;
-        }
-
-        return action;
-    }
-
-    private void OnEnable()
-    {
-        EnableAction(coneSkillAction, OnConeSkillPerformed, ref enabledConeSkillAction);
-        EnableAction(rotationSkillAction, OnRotationSkillPerformed, ref enabledRotationSkillAction);
-    }
-
-    private void EnableAction(
-        InputAction action,
-        System.Action<InputAction.CallbackContext> callback,
-        ref bool enabledBySensor)
-    {
-        if (action == null)
-            return;
-
-        action.performed += callback;
-
-        if (!action.enabled)
-        {
-            action.Enable();
-            enabledBySensor = true;
-        }
     }
 
     private void Update()
@@ -136,7 +70,6 @@ public class CustomerHandSensor : MonoBehaviour
             return;
         }
 
-        UpdateWaitingState();
         UpdateCooldowns();
         UpdateSkillWindow();
         UpdateNearScore();
@@ -183,12 +116,6 @@ public class CustomerHandSensor : MonoBehaviour
 
     private void BeginSkillWindow(AttachedCone cone)
     {
-        if (coneCooldownRemaining > 0f && rotationCooldownRemaining > 0f)
-        {
-            gameFlowManager.GameOver("모든 스킬이 쿨타임인 상태에서 콘이 수령 범위에 닿았습니다.");
-            return;
-        }
-
         if (isSkillWindowOpen)
             return;
 
@@ -199,7 +126,7 @@ public class CustomerHandSensor : MonoBehaviour
         Debug.Log($"스킬 입력 시작: {skillInputWindow:0.##}초", this);
     }
 
-    private void OnConeSkillPerformed(InputAction.CallbackContext context)
+    public void TryUseConeSkill()
     {
         if (!CanUsePendingSkill() || coneCooldownRemaining > 0f)
             return;
@@ -214,30 +141,11 @@ public class CustomerHandSensor : MonoBehaviour
         }
 
         CompleteSkill(completedCone);
-        waitingStick = stick;
+        SetWaitingStick(stick);
         coneCooldownRemaining = coneSkillCooldown;
         gameFlowManager.AddScore(coneSkillSuccessScore);
 
         Debug.Log($"콘만 남기기 성공: +{coneSkillSuccessScore}점", this);
-    }
-
-    private void OnRotationSkillPerformed(InputAction.CallbackContext context)
-    {
-        if (!CanUsePendingSkill() || rotationCooldownRemaining > 0f)
-            return;
-
-        AttachedCone completedCone = pendingCone;
-
-        if (!completedCone.Stick.TryRotateServing(rotationHoldDuration))
-        {
-            FailSkill("막대기를 180도 회전하지 못했습니다.");
-            return;
-        }
-
-        CompleteSkill(completedCone);
-        rotationCooldownRemaining = rotationSkillCooldown;
-
-        Debug.Log($"180도 회전 성공: {rotationHoldDuration:0.##}초 뒤 복원", this);
     }
 
     private bool CanUsePendingSkill()
@@ -260,22 +168,34 @@ public class CustomerHandSensor : MonoBehaviour
         nearScoreTimer = 0f;
     }
 
-    private void UpdateWaitingState()
+    private void SetWaitingStick(StickIceCreamController stick)
     {
-        if (waitingStick == null)
+        if (waitingStick != null)
+        {
+            waitingStick.ServingStateChanged -= HandleWaitingStickStateChanged;
+        }
+
+        waitingStick = stick;
+
+        if (waitingStick != null)
+        {
+            waitingStick.ServingStateChanged += HandleWaitingStickStateChanged;
+            HandleWaitingStickStateChanged();
+        }
+    }
+
+    private void HandleWaitingStickStateChanged()
+    {
+        if (waitingStick == null || !waitingStick.HasCone)
             return;
 
-        if (waitingStick.HasCone)
-        {
-            waitingStick = null;
-            Debug.Log("콘 리필 완료: 손님이 다시 받을 준비를 합니다.", this);
-        }
+        Debug.Log("콘 리필 완료: 손님이 다시 받을 준비를 합니다.", this);
+        SetWaitingStick(null);
     }
 
     private void UpdateCooldowns()
     {
         coneCooldownRemaining = Mathf.Max(0f, coneCooldownRemaining - Time.deltaTime);
-        rotationCooldownRemaining = Mathf.Max(0f, rotationCooldownRemaining - Time.deltaTime);
     }
 
     private void UpdateSkillWindow()
@@ -352,34 +272,13 @@ public class CustomerHandSensor : MonoBehaviour
         }
     }
 
-    private void DisableAction(
-        InputAction action,
-        System.Action<InputAction.CallbackContext> callback,
-        ref bool enabledBySensor)
-    {
-        if (action == null)
-            return;
-
-        action.performed -= callback;
-
-        if (enabledBySensor)
-        {
-            action.Disable();
-            enabledBySensor = false;
-        }
-    }
-
     private void OnDisable()
     {
-        DisableAction(coneSkillAction, OnConeSkillPerformed, ref enabledConeSkillAction);
-        DisableAction(rotationSkillAction, OnRotationSkillPerformed, ref enabledRotationSkillAction);
-
         nearContacts.Clear();
         receiveContacts.Clear();
-        waitingStick = null;
+        SetWaitingStick(null);
         nearScoreTimer = 0f;
         coneCooldownRemaining = 0f;
-        rotationCooldownRemaining = 0f;
         ResetSkillWindow();
     }
 }

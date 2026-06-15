@@ -7,13 +7,17 @@ public class CustomerArmIK : MonoBehaviour
     [SerializeField] private LimbIK limbIK;
     [SerializeField] private Transform ikTarget;
 
+    [Header("References")]
+    [SerializeField] private GameFlowManager gameFlowManager;
+
     [Header("Tracking Speed")]
-    [SerializeField, Min(0.1f)] private float minSpeed = 1f;
-    [SerializeField, Min(0.1f)] private float maxSpeed = 5f;
+    [SerializeField, Min(0.1f)] private float speed = 5f;
+    [SerializeField, Min(0.1f)] private float speedAtEnd = 15f;
 
     [Header("Reach Limit")]
     [SerializeField, Min(0f)] private float maxReach = 1f;
     [SerializeField, Min(0f)] private float forwardOffset = 0.3f;
+
 
     public bool IsAtMaxReach { get; private set; }
 
@@ -23,6 +27,9 @@ public class CustomerArmIK : MonoBehaviour
     {
         if (limbIK == null)
             limbIK = GetComponentInChildren<LimbIK>();
+
+        if (gameFlowManager == null)
+            gameFlowManager = FindAnyObjectByType<GameFlowManager>();
 
         SetIKActive(false);
     }
@@ -44,9 +51,10 @@ public class CustomerArmIK : MonoBehaviour
 
         Vector3 clampedTarget = ClampTarget(trackedCone.transform.position);
         float distance = Vector3.Distance(ikTarget.position, clampedTarget);
-        float speed = Mathf.Lerp(minSpeed, maxSpeed, distance / 2f);
+        float timeRatio = gameFlowManager != null ? Mathf.Clamp01(gameFlowManager.ElapsedTime / gameFlowManager.GameDuration) : 0f;
+        float currentSpeed = Mathf.Lerp(speed, speedAtEnd, timeRatio);
 
-        ikTarget.position = Vector3.MoveTowards(ikTarget.position, clampedTarget, speed * Time.deltaTime);
+        ikTarget.position = Vector3.MoveTowards(ikTarget.position, clampedTarget, currentSpeed * Time.deltaTime);
     }
 
     private Vector3 ClampTarget(Vector3 worldTarget)

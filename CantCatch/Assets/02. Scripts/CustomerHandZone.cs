@@ -56,7 +56,6 @@ public class CustomerHandZone : MonoBehaviour
     {
         return cone != null &&
                cone.Stick != null &&
-               cone.Stick.HasIceCream &&
-               cone.Stick.HasCone;
+               cone.Stick.HasCompleteServing;
     }
 }

@@ -26,7 +26,7 @@ public class TimingGame : MonoBehaviour
     private void Awake()
     {
         if (gameFlowManager == null)
-            gameFlowManager = FindAnyObjectByType<GameFlowManager>();
+            gameFlowManager = GameFlowManager.Instance;
 
         customerInput = GetComponent<ICustomerInput>();
     }

@@ -14,7 +14,7 @@ public class StickPreparationController : MonoBehaviour
 
         if (gameFlowManager == null)
         {
-            gameFlowManager = FindAnyObjectByType<GameFlowManager>();
+            gameFlowManager = GameFlowManager.Instance;
         }
 
         if (stickController == null)
@@ -44,7 +44,7 @@ public class StickPreparationController : MonoBehaviour
 
         if (gameFlowManager == null)
         {
-            gameFlowManager = FindAnyObjectByType<GameFlowManager>();
+            gameFlowManager = GameFlowManager.Instance;
         }
 
         if (gameFlowManager != null && gameFlowManager.State == EGameState.Preparation)

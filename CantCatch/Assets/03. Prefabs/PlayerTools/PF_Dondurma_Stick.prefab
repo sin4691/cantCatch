@@ -232,10 +232,16 @@ MonoBehaviour:
   skillActionMapName: Player
   coneSkillActionName: Attack
   rotationSkillActionName: RotateSkill
-  handSensor: {fileID: 0}
+  faceSkillActionName: FaceSkill
+  singleConeQteController: {fileID: 0}
   stickController: {fileID: 3785382683682809803}
+  gameFlowManager: {fileID: 0}
   rotationHoldDuration: 1
   rotationSkillCooldown: 1
+  maxFaceSkillUses: 2
+  faceSlowMultiplier: 0.5
+  faceSlowDuration: 3
+  faceSkillCooldown: 20
 --- !u!114 &3195117089910287564
 MonoBehaviour:
   m_ObjectHideFlags: 0

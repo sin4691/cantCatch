@@ -54,11 +54,11 @@ public class PlayerSkillController : MonoBehaviour
             isValid = false;
         }
 
-        if (singleConeQteController == null)
-            singleConeQteController = FindAnyObjectByType<SingleConeQteController>();
-
         if (gameFlowManager == null)
-            gameFlowManager = FindAnyObjectByType<GameFlowManager>();
+            gameFlowManager = GameFlowManager.Instance;
+
+        if (singleConeQteController == null && gameFlowManager != null)
+            singleConeQteController = gameFlowManager.GetComponent<SingleConeQteController>();
 
         if (skillInputActions == null)
         {

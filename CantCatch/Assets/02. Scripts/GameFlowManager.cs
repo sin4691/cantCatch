@@ -1,7 +1,10 @@
 using UnityEngine;
 
+[DefaultExecutionOrder(-1000)]
 public class GameFlowManager : MonoBehaviour
 {
+    public static GameFlowManager Instance { get; private set; }
+
     [Header("Time")]
     [SerializeField, Min(1f)] private float gameDuration = 60f;
     [SerializeField, Min(1f)] private float preparationDuration = 15f;
@@ -19,6 +22,18 @@ public class GameFlowManager : MonoBehaviour
         State == EGameState.Preparation ||
         State == EGameState.Playing ||
         State == EGameState.Qte;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogError("GameFlowManager가 씬에 두 개 이상 존재합니다.", this);
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
 
     private void Update()
     {
@@ -112,6 +127,12 @@ public class GameFlowManager : MonoBehaviour
         ChangeState(EGameState.Cleared);
 
         Debug.Log($"게임 클리어: {Score}점");
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
     private void ChangeState(EGameState nextState)

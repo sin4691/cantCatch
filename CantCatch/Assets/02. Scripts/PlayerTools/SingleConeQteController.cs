@@ -59,7 +59,7 @@ public class SingleConeQteController : MonoBehaviour
             gameFlowManager = GetComponent<GameFlowManager>();
 
         if (gameFlowManager == null)
-            gameFlowManager = FindAnyObjectByType<GameFlowManager>();
+            gameFlowManager = GameFlowManager.Instance;
 
         SetUiActive(false);
     }

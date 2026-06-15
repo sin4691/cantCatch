@@ -25,10 +25,10 @@ public class CustomerHandSensor : MonoBehaviour
         bool isValid = true;
 
         if (gameFlowManager == null || !gameFlowManager.gameObject.scene.IsValid())
-            gameFlowManager = FindAnyObjectByType<GameFlowManager>();
+            gameFlowManager = GameFlowManager.Instance;
 
-        if (singleConeQteController == null)
-            singleConeQteController = FindAnyObjectByType<SingleConeQteController>();
+        if (singleConeQteController == null && gameFlowManager != null)
+            singleConeQteController = gameFlowManager.GetComponent<SingleConeQteController>();
 
         if (gameFlowManager == null)
         {

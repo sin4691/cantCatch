@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2205776218028142694}
   - component: {fileID: 8305621126413376351}
+  - component: {fileID: 4761802713825229481}
   m_Layer: 0
   m_Name: GameFlowManager
   m_TagString: Untagged
@@ -44,3 +45,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9f18a5a888ac5940b78a84b12564eb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameFlowManager
+--- !u!114 &4761802713825229481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3858448099743994963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f09853636dde43f6bdd66573a82f15ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SingleConeQteController
+  gameFlowManager: {fileID: 8305621126413376351}
+  qteRoot: {fileID: 0}
+  needle: {fileID: 0}
+  preparationDuration: 3
+  judgmentDuration: 3
+  intervalBetweenJudgments: 0.5
+  startNeedleSpeed: 180
+  endNeedleSpeed: 360
+  successZoneCenter: 0
+  successZoneSize: 0.25
+  greatZoneSize: 0.0625
+  maxJudgmentCount: 3
+  requiredSuccessCount: 2
+  successScore: 10
+  greatScore: 20
+  onQteStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  onQteSucceeded:
+    m_PersistentCalls:
+      m_Calls: []
+  onQteFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  onQteCancelled:
+    m_PersistentCalls:
+      m_Calls: []

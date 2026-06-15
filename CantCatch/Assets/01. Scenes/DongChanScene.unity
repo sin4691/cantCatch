@@ -40432,6 +40432,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PF_Dondurma_Stick
       objectReference: {fileID: 0}
+    - target: {fileID: 3195117089910287564, guid: 181ba4418e7f91c45864dd2982921bec, type: 3}
+      propertyPath: gameFlowManager
+      value: 
+      objectReference: {fileID: 7637222363334068075}
     - target: {fileID: 8280930311455069766, guid: 181ba4418e7f91c45864dd2982921bec, type: 3}
       propertyPath: m_LocalPosition.x
       value: -29.767607
@@ -63810,6 +63814,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
+--- !u!114 &7637222363334068075 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8305621126413376351, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
+  m_PrefabInstance: {fileID: 7637222363334068074}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9f18a5a888ac5940b78a84b12564eb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameFlowManager
 --- !u!114 &7995632350930126368
 MonoBehaviour:
   m_ObjectHideFlags: 0

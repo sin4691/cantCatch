@@ -5,7 +5,7 @@ public class CustomerHandSensor : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private GameFlowManager gameFlowManager;
-    [SerializeField] private SingleConeQteController singleConeQteController;
+    [SerializeField] private ConeQteController coneQteController;
     [SerializeField] private Transform coneReceivePoint;
 
     [Header("Near Score")]
@@ -27,8 +27,8 @@ public class CustomerHandSensor : MonoBehaviour
         if (gameFlowManager == null || !gameFlowManager.gameObject.scene.IsValid())
             gameFlowManager = GameFlowManager.Instance;
 
-        if (singleConeQteController == null && gameFlowManager != null)
-            singleConeQteController = gameFlowManager.GetComponent<SingleConeQteController>();
+        if (coneQteController == null && gameFlowManager != null)
+            coneQteController = gameFlowManager.GetComponent<ConeQteController>();
 
         if (gameFlowManager == null)
         {
@@ -36,9 +36,9 @@ public class CustomerHandSensor : MonoBehaviour
             isValid = false;
         }
 
-        if (singleConeQteController == null)
+        if (coneQteController == null)
         {
-            Debug.LogError("씬에서 SingleConeQteController를 찾을 수 없습니다.", this);
+            Debug.LogError("씬에서 ConeQteController를 찾을 수 없습니다.", this);
             isValid = false;
         }
 
@@ -68,7 +68,7 @@ public class CustomerHandSensor : MonoBehaviour
         contacts[cone] = contactCount + 1;
 
         if (zoneType == CustomerHandZoneType.Receive && !wasAlreadyContacting)
-            singleConeQteController.TryStart(cone, coneReceivePoint);
+            coneQteController.TryStart(cone, coneReceivePoint);
     }
 
     public void Exit(CustomerHandZoneType zoneType, AttachedCone cone)

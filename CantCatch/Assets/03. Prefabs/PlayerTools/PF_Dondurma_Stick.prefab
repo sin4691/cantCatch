@@ -232,7 +232,7 @@ MonoBehaviour:
   qteSubmitActionReference: {fileID: 1120369429361536294, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   rotationSkillActionReference: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   faceSkillActionReference: {fileID: 4041946305653837453, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  singleConeQteController: {fileID: 4761802713825229481, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
+  coneQteController: {fileID: 4761802713825229481, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
   stickController: {fileID: 3785382683682809803}
   gameFlowManager: {fileID: 8305621126413376351, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
   rotationHoldDuration: 1

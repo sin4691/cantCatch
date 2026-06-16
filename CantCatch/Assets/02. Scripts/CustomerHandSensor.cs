@@ -68,7 +68,10 @@ public class CustomerHandSensor : MonoBehaviour
         contacts[cone] = contactCount + 1;
 
         if (zoneType == CustomerHandZoneType.Receive && !wasAlreadyContacting)
+        {
             singleConeQteController.TryStart(cone, coneReceivePoint);
+            TimingGameManager.Instance?.StartTimingGame(cone, coneReceivePoint);
+        }
     }
 
     public void Exit(CustomerHandZoneType zoneType, AttachedCone cone)

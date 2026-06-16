@@ -109,6 +109,17 @@ public class StickIceCreamController : MonoBehaviour
         return true;
     }
 
+    public bool TryDestroyCone()
+    {
+        if (!isConfigured || !HasCone)
+            return false;
+
+        Destroy(currentCone);
+        currentCone = null;
+        NotifyServingStateChanged();
+        return true;
+    }
+
     public bool TryRotateServing(float holdDuration)
     {
         if (!isConfigured || IsRotationSkillActive || holdDuration <= 0f)

@@ -13,20 +13,14 @@ public class ConeQteController : MonoBehaviour
     [Header("References")]
     [SerializeField] private GameFlowManager gameFlowManager;
     [SerializeField] private GameObject qteRoot;
-    [SerializeField] private RectTransform needle;
 
     [Header("Timing")]
     [SerializeField, Min(0.1f)] private float qteDuration = 5f;
-    [SerializeField, Min(1f)] private float startNeedleSpeed = 180f;
-    [SerializeField, Min(1f)] private float endNeedleSpeed = 360f;
 
-    [Header("Judgment Zones")]
-    [SerializeField, Range(0f, 1f)] private float successZoneCenter;
-    [SerializeField, Range(0.01f, 1f)] private float successZoneSize = 0.25f;
-
-    [Header("Temporary Customer Click Mission")]
-    [SerializeField, Min(1)] private int customerRequiredClicks = 15;
-    [SerializeField, Min(1)] private int customerTotalWinThreshold = 80;
+    [Header("Mash Scoring")]
+    [SerializeField, Min(0)] private int merchantWinScore = 10;
+    [SerializeField, Min(0)] private int customerWinScorePenalty = 10;
+    [SerializeField, Min(0)] private int customerStartAdvantagePerGrab = 1;
 
     [Header("Events")]
     public UnityEvent onQteStarted = new();
@@ -41,40 +35,33 @@ public class ConeQteController : MonoBehaviour
     public float QteProgress => qteDuration > 0f
         ? 1f - Mathf.Clamp01(qteTimeRemaining / qteDuration)
         : 1f;
-    public int CustomerRequiredClicks => customerRequiredClicks;
-    public int CustomerCurrentClickCount => customerCurrentClickCount;
-    public int CustomerTotalClickCount => customerTotalClickCount;
-    public int CustomerTotalWinThreshold => customerTotalWinThreshold;
+    public int MerchantMashCount => merchantMashCount;
+    public int CustomerMashCount => customerMashCount;
+    public int CustomerStartAdvantage => customerStartAdvantage;
+    public int MerchantFinalValue => merchantMashCount;
+    public int CustomerFinalValue => customerMashCount + customerStartAdvantage;
+    public int CustomerConeGrabCount => customerConeGrabCount;
 
     private EQtePhase phase;
     private AttachedCone targetCone;
     private Transform receivePoint;
     private float qteTimeRemaining;
-    private float needleProgress;
-    private int customerCurrentClickCount;
-    private int customerTotalClickCount;
-    private bool playerMissionCleared;
+    private int merchantMashCount;
+    private int customerMashCount;
+    private int customerStartAdvantage;
+    private int customerConeGrabCount;
     private EGameState previousGameState = EGameState.Idle;
 
     private void Awake()
     {
         if (gameFlowManager == null)
-        {
             gameFlowManager = GetComponent<GameFlowManager>();
 
-        }
-
         if (gameFlowManager == null)
-        {
             gameFlowManager = GameFlowManager.Instance;
 
-        }
-
         if (gameFlowManager != null)
-        {
             previousGameState = gameFlowManager.State;
-
-        }
 
         SetUiActive(false);
     }
@@ -102,9 +89,9 @@ public class ConeQteController : MonoBehaviour
             return;
 
         UpdateQteSession();
-        UpdatePlayerTimingMission();
 
-        ResolveQteOutcome();
+        if (qteTimeRemaining <= 0f)
+            ResolveQteOutcome();
     }
 
     private void UpdateGameStateTracking()
@@ -115,34 +102,7 @@ public class ConeQteController : MonoBehaviour
         previousGameState = gameFlowManager.State;
 
         if (previousGameState == EGameState.Preparation)
-        {
-            ResetCustomerTotalClicks();
-
-        }
-    }
-
-    private void ResolveQteOutcome()
-    {
-        if (HasCustomerReachedTotalLimit())
-        {
-            ResolveCustomerWin("Customer total QTE clicks reached the lose threshold.");
-            return;
-        }
-
-        if (HasCustomerWonCurrentQte())
-        {
-            ResolveCustomerWin("Customer completed the QTE click mission first.");
-            return;
-        }
-
-        if (IsPlayerTimingMissionCleared())
-        {
-            ResolvePlayerWin();
-            return;
-        }
-
-        if (qteTimeRemaining <= 0f)
-            ResolveTimeout();
+            ResetCustomerQteStartCount();
     }
 
     public bool TryStart(AttachedCone cone, Transform targetReceivePoint)
@@ -157,8 +117,6 @@ public class ConeQteController : MonoBehaviour
         receivePoint = targetReceivePoint;
 
         StartQteSession();
-        StartPlayerTimingMission();
-        StartCustomerClickMission();
         SetUiActive(true);
         onQteStarted.Invoke();
 
@@ -170,15 +128,12 @@ public class ConeQteController : MonoBehaviour
         if (!IsAcceptingInput)
             return;
 
-        SubmitPlayerTimingInput();
+        merchantMashCount++;
     }
 
     public void NotifyPlayerTimingMissionCleared()
     {
-        if (!IsAcceptingInput)
-            return;
-
-        playerMissionCleared = true;
+        SubmitPlayerQteInput();
     }
 
     public void SubmitCustomerQteInput()
@@ -186,12 +141,12 @@ public class ConeQteController : MonoBehaviour
         if (!IsAcceptingInput)
             return;
 
-        SubmitCustomerClickInput();
+        customerMashCount++;
     }
 
     public void ResetCustomerTotalClicks()
     {
-        customerTotalClickCount = 0;
+        ResetCustomerQteStartCount();
     }
 
     public void CancelQte()
@@ -206,6 +161,10 @@ public class ConeQteController : MonoBehaviour
 
     private void StartQteSession()
     {
+        customerStartAdvantage = customerConeGrabCount * customerStartAdvantagePerGrab;
+        customerConeGrabCount++;
+        merchantMashCount = 0;
+        customerMashCount = 0;
         qteTimeRemaining = qteDuration;
         phase = EQtePhase.Running;
     }
@@ -215,119 +174,52 @@ public class ConeQteController : MonoBehaviour
         qteTimeRemaining = Mathf.Max(0f, qteTimeRemaining - Time.deltaTime);
     }
 
-    // Temporary player timing mission. Replace these methods with TimingManager integration later.
-    private void StartPlayerTimingMission()
-    {
-        needleProgress = Random.value;
-        playerMissionCleared = false;
-        SetNeedleRotation();
-    }
-
-    private void UpdatePlayerTimingMission()
-    {
-        UpdateNeedle();
-    }
-
-    private void SubmitPlayerTimingInput()
-    {
-        if (IsNeedleInSuccessZone())
-            playerMissionCleared = true;
-    }
-
-    private bool IsPlayerTimingMissionCleared()
-    {
-        return playerMissionCleared;
-    }
-
-    private void StopPlayerTimingMission()
-    {
-        needleProgress = 0f;
-        playerMissionCleared = false;
-    }
-
-    // Temporary customer click mission. Replace these methods with QuickClick integration later.
-    private void StartCustomerClickMission()
-    {
-        customerCurrentClickCount = 0;
-    }
-
-    private void SubmitCustomerClickInput()
-    {
-        customerCurrentClickCount++;
-        customerTotalClickCount++;
-    }
-
-    private bool HasCustomerWonCurrentQte()
-    {
-        return customerCurrentClickCount >= customerRequiredClicks;
-    }
-
-    private bool HasCustomerReachedTotalLimit()
-    {
-        return customerTotalClickCount >= customerTotalWinThreshold;
-    }
-
-    private void StopCustomerClickMission()
-    {
-        customerCurrentClickCount = 0;
-    }
-
-    private void UpdateNeedle()
-    {
-        float timeRatio = gameFlowManager.GameDuration > 0f
-            ? Mathf.Clamp01(gameFlowManager.ElapsedTime / gameFlowManager.GameDuration)
-            : 0f;
-        float needleSpeed = Mathf.Lerp(startNeedleSpeed, endNeedleSpeed, timeRatio);
-
-        needleProgress = Mathf.Repeat(
-            needleProgress + needleSpeed * Time.deltaTime / 360f,
-            1f);
-        SetNeedleRotation();
-    }
-
-    private bool IsNeedleInSuccessZone()
-    {
-        float distance = Mathf.Abs(Mathf.DeltaAngle(
-            needleProgress * 360f,
-            successZoneCenter * 360f)) / 360f;
-
-        return distance <= successZoneSize * 0.5f;
-    }
-
-    private void ResolvePlayerWin()
+    private void ResolveQteOutcome()
     {
         phase = EQtePhase.Resolved;
 
-        StickIceCreamController stick = targetCone.Stick;
-        Transform targetReceivePoint = receivePoint;
-
-        ResetQte();
-
-        if (stick == null || !stick.TryLeaveCone(targetReceivePoint))
+        if (MerchantFinalValue > CustomerFinalValue)
         {
-            gameFlowManager.GameOver("QTE success could not deliver the cone.");
+            ResolveMerchantWin();
             return;
         }
 
-        gameFlowManager.EndQte();
+        if (CustomerFinalValue > MerchantFinalValue)
+        {
+            ResolveCustomerWin();
+            return;
+        }
+
+        ResolveDraw();
+    }
+
+    private void ResolveMerchantWin()
+    {
+        StickIceCreamController stick = targetCone.Stick;
+        Transform targetReceivePoint = receivePoint;
+
+        if (stick != null && stick.TryLeaveCone(targetReceivePoint))
+            gameFlowManager?.AddScore(merchantWinScore);
+
+        ResetQte();
+        gameFlowManager?.EndQte();
         onQteSucceeded.Invoke();
     }
 
-    private void ResolveCustomerWin(string reason)
+    private void ResolveCustomerWin()
     {
-        phase = EQtePhase.Resolved;
-
         StickIceCreamController stick = targetCone != null ? targetCone.Stick : null;
 
+        if (stick != null && stick.TryDestroyCone())
+            gameFlowManager?.AddScore(-customerWinScorePenalty);
+
         ResetQte();
-        stick?.Clear();
+        gameFlowManager?.EndQte();
         onQteFailed.Invoke();
-        gameFlowManager.GameOver(reason);
     }
 
-    private void ResolveTimeout()
+    private void ResolveDraw()
     {
-        phase = EQtePhase.Resolved;
         ResetQte();
         gameFlowManager?.EndQte();
     }
@@ -336,26 +228,23 @@ public class ConeQteController : MonoBehaviour
     {
         phase = EQtePhase.Inactive;
         qteTimeRemaining = 0f;
-        StopPlayerTimingMission();
-        StopCustomerClickMission();
+        merchantMashCount = 0;
+        customerMashCount = 0;
+        customerStartAdvantage = 0;
         targetCone = null;
         receivePoint = null;
         SetUiActive(false);
     }
 
-    private void SetNeedleRotation()
+    private void ResetCustomerQteStartCount()
     {
-        if (needle != null)
-            needle.localRotation = Quaternion.Euler(0f, 0f, -needleProgress * 360f);
+        customerConeGrabCount = 0;
     }
 
     private void SetUiActive(bool active)
     {
         if (qteRoot != null)
-        {
             qteRoot.SetActive(active);
-
-        }
     }
 
     private void OnDisable()

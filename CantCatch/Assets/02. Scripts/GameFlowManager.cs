@@ -100,7 +100,7 @@ public class GameFlowManager : MonoBehaviour
 
     public void AddScore(int amount)
     {
-        if (amount <= 0 ||
+        if (amount == 0 ||
             (State != EGameState.Playing && State != EGameState.Qte))
         {
             return;

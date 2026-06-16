@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CustomerHandSensor : MonoBehaviour
 {
@@ -8,6 +9,10 @@ public class CustomerHandSensor : MonoBehaviour
     [SerializeField] private ConeQteController coneQteController;
     [SerializeField] private Transform coneReceivePoint;
 
+    [Header("Customer Input")]
+    [SerializeField] private InputActionReference customerConeGrabActionReference;
+    [SerializeField, Min(0f)] private float customerConeGrabCooldown = 0.5f;
+
     [Header("Near Score")]
     [SerializeField, Min(0.01f)] private float nearScoreInterval = 1f;
     [SerializeField, Min(1)] private int nearScorePerInterval = 1;
@@ -15,8 +20,10 @@ public class CustomerHandSensor : MonoBehaviour
     private readonly Dictionary<AttachedCone, int> nearContacts = new();
     private readonly Dictionary<AttachedCone, int> receiveContacts = new();
     private readonly List<AttachedCone> invalidCones = new();
+    private readonly HashSet<AttachedCone> rotationEvadeAwardedCones = new();
 
     private float nearScoreTimer;
+    private float customerConeGrabCooldownRemaining;
 
     public bool HasConeInReceiveZone => receiveContacts.Count > 0;
 
@@ -53,6 +60,9 @@ public class CustomerHandSensor : MonoBehaviour
 
     private void Update()
     {
+        customerConeGrabCooldownRemaining = Mathf.Max(
+            0f,
+            customerConeGrabCooldownRemaining - Time.deltaTime);
         RemoveDestroyedContacts(nearContacts);
         RemoveDestroyedContacts(receiveContacts);
         UpdateNearScore();
@@ -68,10 +78,7 @@ public class CustomerHandSensor : MonoBehaviour
         contacts[cone] = contactCount + 1;
 
         if (zoneType == CustomerHandZoneType.Receive && !wasAlreadyContacting)
-        {
-            coneQteController.TryStart(cone, coneReceivePoint);
-            TimingGameManager.Instance?.StartTimingGame(cone, coneReceivePoint);
-        }
+            rotationEvadeAwardedCones.Remove(cone);
     }
 
     public void Exit(CustomerHandZoneType zoneType, AttachedCone cone)
@@ -84,12 +91,61 @@ public class CustomerHandSensor : MonoBehaviour
             return;
 
         if (contactCount <= 1)
+        {
             contacts.Remove(cone);
+            if (zoneType == CustomerHandZoneType.Receive)
+                rotationEvadeAwardedCones.Remove(cone);
+        }
         else
+        {
             contacts[cone] = contactCount - 1;
+        }
 
         if (zoneType == CustomerHandZoneType.Near && nearContacts.Count == 0)
             nearScoreTimer = 0f;
+    }
+
+    public bool TryStartQteFromCustomerInput()
+    {
+        if (gameFlowManager == null ||
+            gameFlowManager.State != EGameState.Playing ||
+            customerConeGrabCooldownRemaining > 0f)
+        {
+            return false;
+        }
+
+        customerConeGrabCooldownRemaining = customerConeGrabCooldown;
+
+        AttachedCone cone = GetFirstValidReceiveCone();
+        if (cone == null)
+            return false;
+
+        return coneQteController.TryStart(cone, coneReceivePoint);
+    }
+
+    public bool TryConsumeRotationEvade(StickIceCreamController stickController)
+    {
+        if (stickController == null ||
+            gameFlowManager == null ||
+            gameFlowManager.State != EGameState.Playing)
+        {
+            return false;
+        }
+
+        foreach (AttachedCone cone in receiveContacts.Keys)
+        {
+            if (cone == null ||
+                cone.Stick != stickController ||
+                rotationEvadeAwardedCones.Contains(cone))
+            {
+                continue;
+            }
+
+            rotationEvadeAwardedCones.Add(cone);
+            return true;
+        }
+
+        return false;
     }
 
     private void UpdateNearScore()
@@ -116,6 +172,17 @@ public class CustomerHandSensor : MonoBehaviour
             : receiveContacts;
     }
 
+    private AttachedCone GetFirstValidReceiveCone()
+    {
+        foreach (AttachedCone cone in receiveContacts.Keys)
+        {
+            if (cone != null && cone.Stick != null)
+                return cone;
+        }
+
+        return null;
+    }
+
     private void RemoveDestroyedContacts(Dictionary<AttachedCone, int> contacts)
     {
         invalidCones.Clear();
@@ -127,13 +194,43 @@ public class CustomerHandSensor : MonoBehaviour
         }
 
         foreach (AttachedCone cone in invalidCones)
+        {
             contacts.Remove(cone);
+            rotationEvadeAwardedCones.Remove(cone);
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (customerConeGrabActionReference == null ||
+            customerConeGrabActionReference.action == null)
+        {
+            return;
+        }
+
+        customerConeGrabActionReference.action.performed += HandleCustomerConeGrabPerformed;
+
+        if (!customerConeGrabActionReference.action.enabled)
+            customerConeGrabActionReference.action.Enable();
+    }
+
+    private void HandleCustomerConeGrabPerformed(InputAction.CallbackContext context)
+    {
+        TryStartQteFromCustomerInput();
     }
 
     private void OnDisable()
     {
+        if (customerConeGrabActionReference != null &&
+            customerConeGrabActionReference.action != null)
+        {
+            customerConeGrabActionReference.action.performed -= HandleCustomerConeGrabPerformed;
+        }
+
         nearContacts.Clear();
         receiveContacts.Clear();
+        rotationEvadeAwardedCones.Clear();
         nearScoreTimer = 0f;
+        customerConeGrabCooldownRemaining = 0f;
     }
 }

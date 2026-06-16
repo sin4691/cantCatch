@@ -13,10 +13,12 @@ public class PlayerSkillController : MonoBehaviour
     [SerializeField] private ConeQteController coneQteController;
     [SerializeField] private StickIceCreamController stickController;
     [SerializeField] private GameFlowManager gameFlowManager;
+    [SerializeField] private CustomerHandSensor customerHandSensor;
 
     [Header("180 Rotation Skill")]
     [SerializeField, Min(0.01f)] private float rotationHoldDuration = 1f;
     [SerializeField, Min(0f)] private float rotationSkillCooldown = 1f;
+    [SerializeField, Min(0)] private int rotationEvadeScore = 5;
 
     [Header("Face Slow Skill")]
     [SerializeField, Min(1)] private int maxFaceSkillUses = 2;
@@ -62,6 +64,9 @@ public class PlayerSkillController : MonoBehaviour
 
         if (coneQteController == null && gameFlowManager != null)
             coneQteController = gameFlowManager.GetComponent<ConeQteController>();
+
+        if (customerHandSensor == null)
+            customerHandSensor = FindAnyObjectByType<CustomerHandSensor>();
 
         if (gameFlowManager == null)
         {
@@ -160,6 +165,12 @@ public class PlayerSkillController : MonoBehaviour
 
     private void OnRotationSkillPerformed(InputAction.CallbackContext context)
     {
+        if (gameFlowManager != null && gameFlowManager.State == EGameState.Qte)
+        {
+            coneQteController?.SubmitPlayerQteInput();
+            return;
+        }
+
         if (rotationCooldownRemaining > 0f ||
             stickController == null ||
             gameFlowManager == null ||
@@ -170,6 +181,12 @@ public class PlayerSkillController : MonoBehaviour
 
         if (!stickController.TryRotateServing(rotationHoldDuration))
             return;
+
+        if (customerHandSensor != null &&
+            customerHandSensor.TryConsumeRotationEvade(stickController))
+        {
+            gameFlowManager.AddScore(rotationEvadeScore);
+        }
 
         rotationCooldownRemaining = rotationSkillCooldown;
         Debug.Log(

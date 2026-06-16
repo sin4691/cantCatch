@@ -20,6 +20,7 @@ public class CustomerArmIK : MonoBehaviour
     public bool IsAtMaxReach { get; private set; }
 
     private AttachedCone trackedCone;
+    private bool trackingEnabled = true;
 
     private void Awake()
     {
@@ -32,8 +33,21 @@ public class CustomerArmIK : MonoBehaviour
         SetIKActive(false);
     }
 
+    public void SetTrackingEnabled(bool enabled)
+    {
+        trackingEnabled = enabled;
+        if (!enabled)
+        {
+            SetIKActive(false);
+            trackedCone = null;
+        }
+    }
+
     private void Update()
     {
+        if (!trackingEnabled)
+            return;
+
         if (trackedCone == null)
         {
             trackedCone = FindAnyObjectByType<AttachedCone>();

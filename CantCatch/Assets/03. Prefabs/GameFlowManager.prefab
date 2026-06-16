@@ -56,22 +56,17 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f09853636dde43f6bdd66573a82f15ba, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SingleConeQteController
+  m_EditorClassIdentifier: Assembly-CSharp::ConeQteController
   gameFlowManager: {fileID: 8305621126413376351}
   qteRoot: {fileID: 0}
   needle: {fileID: 0}
-  preparationDuration: 3
-  judgmentDuration: 3
-  intervalBetweenJudgments: 0.5
+  qteDuration: 5
   startNeedleSpeed: 180
   endNeedleSpeed: 360
   successZoneCenter: 0
   successZoneSize: 0.25
-  greatZoneSize: 0.0625
-  maxJudgmentCount: 3
-  requiredSuccessCount: 2
-  successScore: 10
-  greatScore: 20
+  customerRequiredClicks: 15
+  customerTotalWinThreshold: 80
   onQteStarted:
     m_PersistentCalls:
       m_Calls: []

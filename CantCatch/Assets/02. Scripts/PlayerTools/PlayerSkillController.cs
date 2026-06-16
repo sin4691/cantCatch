@@ -10,7 +10,7 @@ public class PlayerSkillController : MonoBehaviour
     [SerializeField] private InputActionReference faceSkillActionReference;
 
     [Header("Skill Target")]
-    [SerializeField] private SingleConeQteController singleConeQteController;
+    [SerializeField] private ConeQteController coneQteController;
     [SerializeField] private StickIceCreamController stickController;
     [SerializeField] private GameFlowManager gameFlowManager;
 
@@ -60,8 +60,8 @@ public class PlayerSkillController : MonoBehaviour
         if (gameFlowManager == null)
             gameFlowManager = GameFlowManager.Instance;
 
-        if (singleConeQteController == null && gameFlowManager != null)
-            singleConeQteController = gameFlowManager.GetComponent<SingleConeQteController>();
+        if (coneQteController == null && gameFlowManager != null)
+            coneQteController = gameFlowManager.GetComponent<ConeQteController>();
 
         if (gameFlowManager == null)
         {
@@ -69,9 +69,9 @@ public class PlayerSkillController : MonoBehaviour
             isValid = false;
         }
 
-        if (singleConeQteController == null)
+        if (coneQteController == null)
         {
-            Debug.LogError("SingleConeQteController를 찾을 수 없습니다. GameFlowManager 오브젝트에 SingleConeQteController를 추가하세요.", this);
+            Debug.LogError("ConeQteController를 찾을 수 없습니다. GameFlowManager 오브젝트에 ConeQteController를 추가하세요.", this);
             isValid = false;
         }
 
@@ -155,7 +155,7 @@ public class PlayerSkillController : MonoBehaviour
 
     private void OnConeSkillPerformed(InputAction.CallbackContext context)
     {
-        singleConeQteController?.SubmitInput();
+        coneQteController?.SubmitPlayerQteInput();
     }
 
     private void OnRotationSkillPerformed(InputAction.CallbackContext context)

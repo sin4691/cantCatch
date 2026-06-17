@@ -43,6 +43,18 @@ public class CustomerArmIK : MonoBehaviour
         }
     }
 
+    // 미니게임 시작 시 - IK는 유지한 채 현재 자세로 고정
+    public void Freeze()
+    {
+        trackingEnabled = false;
+    }
+
+    // 미니게임 종료 시 - 트래킹 재개
+    public void Unfreeze()
+    {
+        trackingEnabled = true;
+    }
+
     private void Update()
     {
         if (!trackingEnabled)

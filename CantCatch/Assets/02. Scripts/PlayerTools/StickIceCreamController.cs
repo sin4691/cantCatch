@@ -42,9 +42,7 @@ public class StickIceCreamController : MonoBehaviour
     private void Awake()
     {
         if (grabInteractable == null)
-        {
             grabInteractable = GetComponent<XRGrabInteractable>();
-        }
 
         isConfigured = ValidateReferences();
         enabled = isConfigured;
@@ -86,6 +84,7 @@ public class StickIceCreamController : MonoBehaviour
         AttachedCone attachedCone = currentCone.GetComponent<AttachedCone>();
         attachedCone.Initialize(this);
         NotifyServingStateChanged();
+        GameFlowManager.Instance?.CompletePreparation();
 
         Debug.Log("아이스크림에 콘 생성");
         return true;
@@ -123,9 +122,7 @@ public class StickIceCreamController : MonoBehaviour
     public bool TryRotateServing(float holdDuration)
     {
         if (!isConfigured || IsRotationSkillActive || holdDuration <= 0f)
-        {
             return false;
-        }
 
         rotationSkillRoutine = StartCoroutine(RotateServingRoutine(holdDuration));
         return true;
@@ -158,10 +155,10 @@ public class StickIceCreamController : MonoBehaviour
         }
 
         if (hadServing)
-        {
             NotifyServingStateChanged();
-        }
     }
+
+
 
     private void NotifyServingStateChanged()
     {
@@ -179,12 +176,8 @@ public class StickIceCreamController : MonoBehaviour
 
     private IEnumerator RotateServingRoutine(float holdDuration)
     {
-        ApplyServingRotation(Quaternion.AngleAxis(
-            180f,
-            rotationSkillAxis.normalized));
-
+        ApplyServingRotation(Quaternion.AngleAxis(180f, rotationSkillAxis.normalized));
         yield return new WaitForSeconds(holdDuration);
-
         RestoreServingRotation();
         rotationSkillRoutine = null;
     }
@@ -192,10 +185,8 @@ public class StickIceCreamController : MonoBehaviour
     private void ApplyServingRotation(Quaternion rotation)
     {
         skillVisualRoot.localRotation = rotation * visualOriginalRotation;
-
         iceCreamAttachPoint.localPosition = rotation * iceCreamAttachOriginalPosition;
         iceCreamAttachPoint.localRotation = rotation * iceCreamAttachOriginalRotation;
-
         coneAttachPoint.localPosition = rotation * coneAttachOriginalPosition;
         coneAttachPoint.localRotation = rotation * coneAttachOriginalRotation;
     }
@@ -209,17 +200,14 @@ public class StickIceCreamController : MonoBehaviour
         coneAttachPoint.localRotation = coneAttachOriginalRotation;
     }
 
-    private void SetCollidersEnabled(GameObject target, bool isEnabled) //손에 남긴 콘이 손 Collider와 충돌해 밀려나거나 떨리는 것을 방지
+    private void SetCollidersEnabled(GameObject target, bool isEnabled)
     {
         Collider[] colliders = target.GetComponentsInChildren<Collider>(true);
-
         foreach (Collider targetCollider in colliders)
-        {
             targetCollider.enabled = isEnabled;
-        }
     }
 
-    private bool ValidateReferences() //Inspector 연결 오류를 게임 시작 시 한 번에 찾기
+    private bool ValidateReferences()
     {
         bool isValid = true;
 

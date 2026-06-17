@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3785382683682809803}
   - component: {fileID: 6943352819674549731}
   - component: {fileID: 3195117089910287564}
+  - component: {fileID: 4037524510101039890}
   m_Layer: 0
   m_Name: PF_Dondurma_Stick
   m_TagString: Untagged
@@ -150,7 +151,7 @@ MonoBehaviour:
   m_SnapToColliderVolume: 1
   m_ReinitializeDynamicAttachEverySingleGrab: 1
   m_AttachEaseInTime: 0.15
-  m_MovementType: 2
+  m_MovementType: 1
   m_PredictedVisualsTransform: {fileID: 2908211807437760032}
   m_VelocityDamping: 1
   m_VelocityScale: 1
@@ -214,7 +215,7 @@ MonoBehaviour:
   rotationSkillAxis: {x: 0, y: 1, z: 0}
   iceCreamPrefab: {fileID: 7301043778394201591, guid: 687308a95f77d4b459a4ab42dfce7843, type: 3}
   iceCreamAttachPoint: {fileID: 5607412029066975867}
-  conePrefab: {fileID: 6524277618742970776, guid: 164f51a71d5b18d45b1afa58969ff9c4, type: 3}
+  conePrefab: {fileID: 3697696661320050074, guid: e6aa9024c47d226479f88ed0007529e7, type: 3}
   coneAttachPoint: {fileID: 2264433088253984209}
 --- !u!114 &6943352819674549731
 MonoBehaviour:
@@ -232,11 +233,13 @@ MonoBehaviour:
   qteSubmitActionReference: {fileID: 1120369429361536294, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   rotationSkillActionReference: {fileID: -2099379676528639254, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   faceSkillActionReference: {fileID: 4041946305653837453, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  coneQteController: {fileID: 4761802713825229481, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
+  mashInput: {fileID: 0}
   stickController: {fileID: 3785382683682809803}
   gameFlowManager: {fileID: 8305621126413376351, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
+  customerHandSensor: {fileID: 0}
   rotationHoldDuration: 1
   rotationSkillCooldown: 1
+  rotationEvadeScore: 5
   maxFaceSkillUses: 2
   faceSlowMultiplier: 0.5
   faceSlowDuration: 3
@@ -255,6 +258,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StickPreparationController
   stickController: {fileID: 3785382683682809803}
   gameFlowManager: {fileID: 8305621126413376351, guid: 3a3f9f22247161a4c9d538f7c9f18e8e, type: 3}
+--- !u!114 &4037524510101039890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846633547081268363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f86fb6862001e247b8b8146203628ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrabLock
 --- !u!1 &1694442887382493104
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,6 +10,9 @@ public class MinigameManager : MonoBehaviour
     [Header("Duration")]
     [SerializeField, Min(1f)] private float gameDuration = 10f;
 
+    [Header("Cooldown")]
+    [SerializeField, Min(0f)] private float cooldownAfterGame = 3f;
+
     [Header("Events")]
     public UnityEvent onMinigameStarted;
     public UnityEvent onCustomerWin;
@@ -20,14 +23,42 @@ public class MinigameManager : MonoBehaviour
     public AttachedCone PendingCone { get; private set; }
     public Transform ReceivePoint { get; private set; }
 
+    private float cooldownRemaining;
+
     private void Awake()
     {
         Instance = this;
+        if (sliderUI != null)
+            sliderUI.gameObject.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (cooldownRemaining > 0f)
+            cooldownRemaining -= Time.deltaTime;
+
+#if UNITY_EDITOR
+        var kb = UnityEngine.InputSystem.Keyboard.current;
+        if (kb == null) return;
+
+        if (kb.gKey.wasPressedThisFrame)
+        {
+            GameFlowManager.Instance?.StartSinglePlayer();
+            GameFlowManager.Instance?.CompletePreparation();
+        }
+
+        if (kb.tKey.wasPressedThisFrame)
+        {
+            AttachedCone cone = FindAnyObjectByType<AttachedCone>();
+            CustomerHandZone receiveZone = FindAnyObjectByType<CustomerHandZone>();
+            StartMinigame(cone, receiveZone?.transform);
+        }
+#endif
     }
 
     public bool StartMinigame(AttachedCone cone, Transform receivePoint)
     {
-        if (IsActive || cone == null)
+        if (IsActive || cooldownRemaining > 0f || cone == null)
             return false;
 
         IsActive = true;
@@ -36,6 +67,7 @@ public class MinigameManager : MonoBehaviour
 
         if (sliderUI != null)
         {
+            sliderUI.gameObject.SetActive(true);
             sliderUI.SetDuration(gameDuration);
             sliderUI.ResetView();
             sliderUI.StartTimer();
@@ -91,13 +123,15 @@ public class MinigameManager : MonoBehaviour
         StopAllCoroutines();
         PendingCone = null;
         ReceivePoint = null;
-        sliderUI?.StopTimer();
+        cooldownRemaining = cooldownAfterGame;
+
+        if (sliderUI != null)
+            sliderUI.gameObject.SetActive(false);
     }
 
     private IEnumerator TimerCoroutine()
     {
         yield return new WaitForSeconds(gameDuration);
-
         if (!IsActive) yield break;
 
         float progress = sliderUI != null ? sliderUI.TargetProgress : 0f;
@@ -109,25 +143,4 @@ public class MinigameManager : MonoBehaviour
         else
             StopMinigame();
     }
-
-#if UNITY_EDITOR
-    private void Update()
-    {
-        var kb = UnityEngine.InputSystem.Keyboard.current;
-        if (kb == null) return;
-
-        if (kb.gKey.wasPressedThisFrame)
-        {
-            GameFlowManager.Instance?.StartSinglePlayer();
-            GameFlowManager.Instance?.CompletePreparation();
-        }
-
-        if (kb.tKey.wasPressedThisFrame)
-        {
-            AttachedCone cone = FindAnyObjectByType<AttachedCone>();
-            CustomerHandZone receiveZone = FindAnyObjectByType<CustomerHandZone>();
-            StartMinigame(cone, receiveZone?.transform);
-        }
-    }
-#endif
 }

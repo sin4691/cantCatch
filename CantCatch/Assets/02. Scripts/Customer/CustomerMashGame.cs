@@ -27,6 +27,13 @@ public class CustomerMashGame : MonoBehaviour
         if (headLookAt == null) headLookAt = GetComponentInParent<CustomerHeadLookAt>();
     }
 
+    // MinigameManager.onMinigameStarted 에 연결
+    public void OnMinigameStart()
+    {
+        armIK?.Freeze();
+        if (headLookAt != null) headLookAt.SetTrackingEnabled(false);
+    }
+
     // MinigameManager.onCustomerWin 에 연결
     public void OnCustomerWin()
     {
@@ -85,7 +92,7 @@ public class CustomerMashGame : MonoBehaviour
     private IEnumerator ReenableTrackingAfterDelay()
     {
         yield return new WaitForSeconds(trackingDisableDuration);
-        armIK?.SetTrackingEnabled(true);
+        armIK?.Unfreeze();
         if (headLookAt != null) headLookAt.SetTrackingEnabled(true);
     }
 }

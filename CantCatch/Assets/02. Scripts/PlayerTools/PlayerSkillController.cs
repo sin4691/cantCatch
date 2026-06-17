@@ -10,7 +10,7 @@ public class PlayerSkillController : MonoBehaviour
     [SerializeField] private InputActionReference faceSkillActionReference;
 
     [Header("Skill Target")]
-    [SerializeField] private ConeQteController coneQteController;
+    [SerializeField] private MashInput mashInput;
     [SerializeField] private StickIceCreamController stickController;
     [SerializeField] private GameFlowManager gameFlowManager;
     [SerializeField] private CustomerHandSensor customerHandSensor;
@@ -36,7 +36,7 @@ public class PlayerSkillController : MonoBehaviour
     private bool enabledFaceSkillAction;
     private EGameState previousGameState = EGameState.Idle;
 
-    private const string QteSubmitActionPath = "Player/QteSubmit";
+    private const string QteSubmitActionPath = "Player/Mash";
     private const string RotationSkillActionPath = "Player/RotateSkill";
     private const string FaceSkillActionPath = "Player/FaceSkill";
 
@@ -62,21 +62,12 @@ public class PlayerSkillController : MonoBehaviour
         if (gameFlowManager == null)
             gameFlowManager = GameFlowManager.Instance;
 
-        if (coneQteController == null && gameFlowManager != null)
-            coneQteController = gameFlowManager.GetComponent<ConeQteController>();
-
         if (customerHandSensor == null)
             customerHandSensor = FindAnyObjectByType<CustomerHandSensor>();
 
         if (gameFlowManager == null)
         {
             Debug.LogError("GameFlowManager.Instance를 찾을 수 없습니다.", this);
-            isValid = false;
-        }
-
-        if (coneQteController == null)
-        {
-            Debug.LogError("ConeQteController를 찾을 수 없습니다. GameFlowManager 오브젝트에 ConeQteController를 추가하세요.", this);
             isValid = false;
         }
 
@@ -160,14 +151,14 @@ public class PlayerSkillController : MonoBehaviour
 
     private void OnConeSkillPerformed(InputAction.CallbackContext context)
     {
-        coneQteController?.SubmitPlayerQteInput();
+        mashInput?.TriggerMash();
     }
 
     private void OnRotationSkillPerformed(InputAction.CallbackContext context)
     {
-        if (gameFlowManager != null && gameFlowManager.State == EGameState.Qte)
+        if (MinigameManager.Instance != null && MinigameManager.Instance.IsActive)
         {
-            coneQteController?.SubmitPlayerQteInput();
+            mashInput?.TriggerMash();
             return;
         }
 

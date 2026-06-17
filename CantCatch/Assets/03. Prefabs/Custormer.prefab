@@ -5731,13 +5731,14 @@ GameObject:
   - component: {fileID: 7929019463200935181}
   - component: {fileID: 8277544790450440712}
   - component: {fileID: 5606215029986431500}
-  - component: {fileID: 6562022757543752285}
   - component: {fileID: 4438018663606465485}
   - component: {fileID: 1019676845017916146}
   - component: {fileID: 9100000000000000003}
   - component: {fileID: 2741743057405017795}
+  - component: {fileID: 2962255982172405431}
+  - component: {fileID: 5528311032210198151}
   m_Layer: 0
-  m_Name: CustormerV2
+  m_Name: Custormer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5846,8 +5847,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerHandSensor
   gameFlowManager: {fileID: 0}
-  coneQteController: {fileID: 0}
   coneReceivePoint: {fileID: 8352150334742464543}
+  grabCooldown: 0.5
   nearScoreInterval: 1
   nearScorePerInterval: 1
 --- !u!114 &8277544790450440712
@@ -5889,20 +5890,6 @@ MonoBehaviour:
   speedAtEnd: 3
   maxReach: 3
   forwardOffset: 0.3
---- !u!114 &6562022757543752285
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2443524490154100196}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 428732eaf7e507641b3c041b5dafe68f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TimedCustomerInput
-  startInterval: 1
-  endInterval: 0.2
 --- !u!114 &4438018663606465485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6008,16 +5995,42 @@ MonoBehaviour:
   animator: {fileID: 8141950007923886842}
   armIK: {fileID: 5606215029986431500}
   headLookAt: {fileID: 1019676845017916146}
-  requiredMashCount: 5
   winTriggerName: Win
   loseTriggerName: Throw
   throwDirection: {x: 0, y: 0.5, z: 1}
-  throwForce: 10
-  coneDestroyDelay: 2
-  startInterval: 1
-  endInterval: 0.2
+  throwForce: 15
   throwReleaseDelay: 0.5
+  coneDestroyDelay: 2
   trackingDisableDuration: 2
+--- !u!114 &2962255982172405431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2443524490154100196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5ab633556719f74f942ecb347471e26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MashInput
+  side: 0
+--- !u!114 &5528311032210198151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2443524490154100196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78763492deb58bf4dbc1dfb1cc0d010e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerAIInput
+  handSensor: {fileID: 0}
+  mashInput: {fileID: 0}
+  startAttemptInterval: 0.3
+  mashInterval: 0.3
 --- !u!1 &2554737292045614768
 GameObject:
   m_ObjectHideFlags: 0
@@ -11750,7 +11763,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6719683394568939595
 Transform:
   m_ObjectHideFlags: 0
@@ -13130,7 +13143,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &54397811310001504
 Transform:
   m_ObjectHideFlags: 0

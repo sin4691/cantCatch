@@ -38,7 +38,7 @@ public class TimingGameManager : MonoBehaviour
 
         if (kb.gKey.wasPressedThisFrame)
         {
-            GameFlowManager.Instance?.StartSinglePlayer();
+            GameFlowManager.Instance?.StartSinglePlayerImmediate();
             GameFlowManager.Instance?.CompletePreparation();
         }
     }

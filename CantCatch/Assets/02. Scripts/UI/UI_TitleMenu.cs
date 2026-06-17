@@ -18,7 +18,14 @@ public class UI_TitleMenu : MonoBehaviour
 
     public void OnClickSingleStart()
     {
-        // TODO GameFlowManager 시작 버튼 연결
+        GameFlowManager gameFlowManager = GameFlowManager.Instance;
+        if (gameFlowManager == null)
+        {
+            Debug.LogError("GameFlowManager.Instance를 찾을 수 없습니다.", this);
+            return;
+        }
+
+        gameFlowManager.StartSinglePlayer();
     }
 
     public void OnClickMultiStart()

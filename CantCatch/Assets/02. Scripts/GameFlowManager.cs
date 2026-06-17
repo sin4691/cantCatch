@@ -276,10 +276,6 @@ public class GameFlowManager : MonoBehaviour
             coneQteController.ResetCustomerTotalClicks();
         }
 
-        TimingGameManager timingGameManager = TimingGameManager.Instance;
-        if (timingGameManager != null)
-            timingGameManager.StopTimingGame();
-
         // TODO: Player 상위 스크립트가 생기면 그곳에서 플레이어 관련 초기화를 묶어서 처리한다.
     }
 

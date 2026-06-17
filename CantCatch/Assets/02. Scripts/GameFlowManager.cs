@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [DefaultExecutionOrder(-1000)]
@@ -9,12 +10,23 @@ public class GameFlowManager : MonoBehaviour
     [SerializeField, Min(1f)] private float gameDuration = 60f;
     [SerializeField, Min(1f)] private float preparationDuration = 15f;
 
+    private int lastNotifiedGameTimerSeconds = -1;
+    private int lastNotifiedPreparationTimerSeconds = -1;
+    private bool lastNotifiedPreparationVisibility;
+
+    public event Action<int> GameTimerSecondsChanged;
+    public event Action<int> PreparationTimerSecondsChanged;
+    public event Action<bool> PreparationTimerVisibilityChanged;
+
     public EGameState State { get; private set; } = EGameState.Idle;
     public int Score { get; private set; }
     public float ElapsedTime { get; private set; }
     public float GameDuration => gameDuration;
     public float GameTimeRemaining => Mathf.Max(0f, gameDuration - ElapsedTime);
+    public int GameTimeRemainingSeconds => Mathf.CeilToInt(GameTimeRemaining);
     public float PreparationTimeRemaining { get; private set; }
+    public int PreparationTimeRemainingSeconds => Mathf.CeilToInt(Mathf.Max(0f, PreparationTimeRemaining));
+    public bool ShouldShowPreparationTimer => State == EGameState.Preparation;
     public string EndReason { get; private set; } = string.Empty;
 
     public bool IsGameOver => State == EGameState.GameOver;
@@ -33,6 +45,14 @@ public class GameFlowManager : MonoBehaviour
         }
 
         Instance = this;
+        lastNotifiedGameTimerSeconds = GameTimeRemainingSeconds;
+        lastNotifiedPreparationTimerSeconds = PreparationTimeRemainingSeconds;
+        lastNotifiedPreparationVisibility = ShouldShowPreparationTimer;
+    }
+
+    private void Start()
+    {
+        StartSinglePlayer();
     }
 
     private void Update()
@@ -41,6 +61,7 @@ public class GameFlowManager : MonoBehaviour
             return;
 
         ElapsedTime = Mathf.Min(gameDuration, ElapsedTime + Time.deltaTime);
+        NotifyTimerEvents();
 
         if (ElapsedTime >= gameDuration)
         {
@@ -54,6 +75,7 @@ public class GameFlowManager : MonoBehaviour
         PreparationTimeRemaining = Mathf.Max(
             0f,
             PreparationTimeRemaining - Time.deltaTime);
+        NotifyTimerEvents();
 
         if (PreparationTimeRemaining <= 0f)
         {
@@ -141,6 +163,32 @@ public class GameFlowManager : MonoBehaviour
             return;
 
         State = nextState;
+
+        NotifyTimerEvents(force: true);
         Debug.Log($"게임 상태: {State}");
+    }
+
+    private void NotifyTimerEvents(bool force = false)
+    {
+        int gameSeconds = GameTimeRemainingSeconds;
+        if (force || gameSeconds != lastNotifiedGameTimerSeconds)
+        {
+            lastNotifiedGameTimerSeconds = gameSeconds;
+            GameTimerSecondsChanged?.Invoke(gameSeconds);
+        }
+
+        int preparationSeconds = PreparationTimeRemainingSeconds;
+        if (force || preparationSeconds != lastNotifiedPreparationTimerSeconds)
+        {
+            lastNotifiedPreparationTimerSeconds = preparationSeconds;
+            PreparationTimerSecondsChanged?.Invoke(preparationSeconds);
+        }
+
+        bool shouldShowPreparation = ShouldShowPreparationTimer;
+        if (force || shouldShowPreparation != lastNotifiedPreparationVisibility)
+        {
+            lastNotifiedPreparationVisibility = shouldShowPreparation;
+            PreparationTimerVisibilityChanged?.Invoke(shouldShowPreparation);
+        }
     }
 }

@@ -174,11 +174,26 @@ public class StickIceCreamController : MonoBehaviour
         return instance;
     }
 
-    private IEnumerator RotateServingRoutine(float holdDuration)
+    private float currentRotationAngle;
+
+    private IEnumerator RotateServingRoutine(float duration)
     {
-        ApplyServingRotation(Quaternion.AngleAxis(180f, rotationSkillAxis.normalized));
-        yield return new WaitForSeconds(holdDuration);
-        RestoreServingRotation();
+        float startAngle = currentRotationAngle;
+        float targetAngle = currentRotationAngle + 180f;
+        float elapsed = 0f;
+        Vector3 axis = rotationSkillAxis.normalized;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration));
+            float angle = Mathf.LerpAngle(startAngle, targetAngle, t);
+            ApplyServingRotation(Quaternion.AngleAxis(angle, axis));
+            yield return null;
+        }
+
+        currentRotationAngle = targetAngle % 360f;
+        ApplyServingRotation(Quaternion.AngleAxis(currentRotationAngle, axis));
         rotationSkillRoutine = null;
     }
 
@@ -276,6 +291,7 @@ public class StickIceCreamController : MonoBehaviour
 
         StopCoroutine(rotationSkillRoutine);
         rotationSkillRoutine = null;
+        currentRotationAngle = 0f;
         RestoreServingRotation();
     }
 

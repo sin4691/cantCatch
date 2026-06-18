@@ -31,6 +31,7 @@ public class GameFlowManager : MonoBehaviour
     private bool lastNotifiedPreparationVisibility;
     private bool isStartSequenceRunning;
 
+    public event Action<int> ScoreChanged;
     public event Action<int> GameTimerSecondsChanged;
     public event Action<int> PreparationTimerSecondsChanged;
     public event Action<bool> PreparationTimerVisibilityChanged;
@@ -161,6 +162,7 @@ public class GameFlowManager : MonoBehaviour
         }
 
         Score += amount;
+        ScoreChanged?.Invoke(Score);
         Debug.Log($"점수: {Score}");
     }
 

@@ -128,8 +128,9 @@ public class PlayerSkillController : MonoBehaviour
     private void OnEnable()
     {
         EnableAction(coneSkillAction, OnConeSkillPerformed, ref enabledConeSkillAction);
-        EnableAction(rotationSkillAction, OnRotationSkillPerformed, ref enabledRotationSkillAction);
+        EnableAction(rotationSkillAction, OnRotationSkillPerformed_impl, ref enabledRotationSkillAction);
         EnableAction(faceSkillAction, OnFaceSkillPerformed, ref enabledFaceSkillAction);
+        Debug.Log($"[PlayerSkillController] OnEnable — rotationAction={rotationSkillAction?.name}, enabled={rotationSkillAction?.enabled}");
     }
 
     private void EnableAction(
@@ -156,22 +157,31 @@ public class PlayerSkillController : MonoBehaviour
 
     private void OnRotationSkillPerformed(InputAction.CallbackContext context)
     {
+        Debug.Log($"[PlayerSkillController] RotateSkill performed, state={gameFlowManager?.State}, cooldown={rotationCooldownRemaining}");
+    }
+
+    private void OnRotationSkillPerformed_impl(InputAction.CallbackContext context)
+    {
+        Debug.Log($"[RotationSkill] 입력 감지됨");
+
         if (MinigameManager.Instance != null && MinigameManager.Instance.IsActive)
         {
+            Debug.Log($"[RotationSkill] 미니게임 중 — mash로 전환");
             mashInput?.TriggerMash();
             return;
         }
 
-        if (rotationCooldownRemaining > 0f ||
-            stickController == null ||
-            gameFlowManager == null ||
-            gameFlowManager.State != EGameState.Playing)
-        {
-            return;
-        }
+        if (rotationCooldownRemaining > 0f)
+        { Debug.Log($"[RotationSkill] 쿨타임 중: {rotationCooldownRemaining:0.##}초"); return; }
+        if (stickController == null)
+        { Debug.Log($"[RotationSkill] stickController 없음"); return; }
+        if (gameFlowManager == null)
+        { Debug.Log($"[RotationSkill] gameFlowManager 없음"); return; }
+        if (gameFlowManager.State != EGameState.Playing)
+        { Debug.Log($"[RotationSkill] 게임 상태가 Playing 아님: {gameFlowManager.State}"); return; }
 
         if (!stickController.TryRotateServing(rotationHoldDuration))
-            return;
+        { Debug.Log($"[RotationSkill] TryRotateServing 실패 (이미 돌아가는 중?)"); return; }
 
         if (customerHandSensor != null &&
             customerHandSensor.TryConsumeRotationEvade(stickController))
@@ -234,7 +244,7 @@ public class PlayerSkillController : MonoBehaviour
     private void OnDisable()
     {
         DisableAction(coneSkillAction, OnConeSkillPerformed, ref enabledConeSkillAction);
-        DisableAction(rotationSkillAction, OnRotationSkillPerformed, ref enabledRotationSkillAction);
+        DisableAction(rotationSkillAction, OnRotationSkillPerformed_impl, ref enabledRotationSkillAction);
         DisableAction(faceSkillAction, OnFaceSkillPerformed, ref enabledFaceSkillAction);
         rotationCooldownRemaining = 0f;
         faceCooldownRemaining = 0f;

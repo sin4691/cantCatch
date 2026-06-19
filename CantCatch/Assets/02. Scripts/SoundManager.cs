@@ -4,6 +4,9 @@ using UnityEngine;
 [DefaultExecutionOrder(-900)]
 public class SoundManager : MonoBehaviour
 {
+    private const string BgmVolumePrefsKey = "BgmVolume";
+    private const string SfxVolumePrefsKey = "SfxVolume";
+
     [System.Serializable]
     private class BgmSoundEntry
     {
@@ -19,6 +22,8 @@ public class SoundManager : MonoBehaviour
     }
 
     public static SoundManager Instance { get; private set; }
+    public float BgmVolume => bgmVolume;
+    public float SfxVolume => sfxVolume;
 
     [Header("Hierarchy")]
     [SerializeField] private Transform bgmRoot;
@@ -55,6 +60,7 @@ public class SoundManager : MonoBehaviour
         if (keepAliveBetweenScenes)
             DontDestroyOnLoad(gameObject);
 
+        LoadVolumeSettings();
         BuildClipMaps();
         isInitialized = InitializeSources();
 
@@ -112,6 +118,8 @@ public class SoundManager : MonoBehaviour
     public void SetBgmVolume(float volume)
     {
         bgmVolume = Mathf.Clamp01(volume);
+        PlayerPrefs.SetFloat(BgmVolumePrefsKey, bgmVolume);
+
         if (isInitialized && bgmSource != null)
             bgmSource.volume = bgmVolume;
     }
@@ -119,6 +127,7 @@ public class SoundManager : MonoBehaviour
     public void SetSfxVolume(float volume)
     {
         sfxVolume = Mathf.Clamp01(volume);
+        PlayerPrefs.SetFloat(SfxVolumePrefsKey, sfxVolume);
 
         for (int i = 0; i < sfxSources.Count; i++)
         {
@@ -152,6 +161,12 @@ public class SoundManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    private void LoadVolumeSettings()
+    {
+        bgmVolume = PlayerPrefs.GetFloat(BgmVolumePrefsKey, bgmVolume);
+        sfxVolume = PlayerPrefs.GetFloat(SfxVolumePrefsKey, sfxVolume);
     }
 
     private void ApplyVolumes()

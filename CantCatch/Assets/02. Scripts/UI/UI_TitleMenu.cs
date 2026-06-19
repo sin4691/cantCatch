@@ -1,19 +1,72 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UI_TitleMenu : MonoBehaviour
 {
     [SerializeField] private GameObject titlePanel;
     [SerializeField] private GameObject optionPanel;
+    [SerializeField] private Slider bgmSlider;
+    [SerializeField] private Slider sfxSlider;
 
     private void Start()
     {
         ResetPanel();
+        InitializeVolumeSliders();
+    }
+
+    private void OnDestroy()
+    {
+        if (bgmSlider != null)
+            bgmSlider.onValueChanged.RemoveListener(OnChangedBgmVolume);
+
+        if (sfxSlider != null)
+            sfxSlider.onValueChanged.RemoveListener(OnChangedSfxVolume);
     }
 
     private void ResetPanel()
     {
         titlePanel.SetActive(true);
         optionPanel.SetActive(false);
+    }
+
+    private void InitializeVolumeSliders()
+    {
+        SoundManager soundManager = SoundManager.Instance;
+        if (soundManager == null)
+        {
+            Debug.LogWarning("SoundManager.Instance를 찾을 수 없어 볼륨 슬라이더를 초기화하지 못했습니다.", this);
+            return;
+        }
+
+        if (bgmSlider != null)
+        {
+            bgmSlider.SetValueWithoutNotify(soundManager.BgmVolume);
+            bgmSlider.onValueChanged.RemoveListener(OnChangedBgmVolume);
+            bgmSlider.onValueChanged.AddListener(OnChangedBgmVolume);
+        }
+
+        if (sfxSlider != null)
+        {
+            sfxSlider.SetValueWithoutNotify(soundManager.SfxVolume);
+            sfxSlider.onValueChanged.RemoveListener(OnChangedSfxVolume);
+            sfxSlider.onValueChanged.AddListener(OnChangedSfxVolume);
+        }
+    }
+
+    public void OnChangedBgmVolume(float value)
+    {
+        if (SoundManager.Instance == null)
+            return;
+
+        SoundManager.Instance.SetBgmVolume(value);
+    }
+
+    public void OnChangedSfxVolume(float value)
+    {
+        if (SoundManager.Instance == null)
+            return;
+
+        SoundManager.Instance.SetSfxVolume(value);
     }
 
     public void OnClickSingleStart()

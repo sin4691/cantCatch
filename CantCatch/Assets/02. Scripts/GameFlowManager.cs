@@ -187,6 +187,7 @@ public class GameFlowManager : MonoBehaviour
 
         EndReason = reason;
         ChangeState(EGameState.GameOver);
+        SetGameOverUiVisible(true);
 
         Debug.LogError($"게임오버: {reason}");
     }
@@ -213,6 +214,8 @@ public class GameFlowManager : MonoBehaviour
         EndReason = string.Empty;
 
         ChangeState(EGameState.Preparation);
+        SetGameOverUiVisible(false);
+        NotifyHudEvents(forceTimer: true);
     }
 
     private async UniTaskVoid StartSinglePlayerAsync()
@@ -315,10 +318,13 @@ public class GameFlowManager : MonoBehaviour
             return;
 
         State = nextState;
-
-        SetGameOverUiVisible(State == EGameState.GameOver);
-        NotifyTimerEvents(force: true);
         Debug.Log($"게임 상태: {State}");
+    }
+
+    private void NotifyHudEvents(bool forceTimer = false)
+    {
+        ScoreChanged?.Invoke(Score);
+        NotifyTimerEvents(force: forceTimer);
     }
 
     private void NotifyTimerEvents(bool force = false)
@@ -372,6 +378,8 @@ public class GameFlowManager : MonoBehaviour
         PreparationTimeRemaining = 0f;
         EndReason = string.Empty;
         ChangeState(EGameState.Idle);
+        SetGameOverUiVisible(false);
+        NotifyHudEvents(forceTimer: true);
     }
 
     private void MoveXrOriginTo(Transform targetPoint)

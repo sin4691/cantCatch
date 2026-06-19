@@ -1,5 +1,4 @@
 using System;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 [DefaultExecutionOrder(-1000)]
@@ -7,31 +6,16 @@ public class GameFlowManager : MonoBehaviour
 {
     public static GameFlowManager Instance { get; private set; }
 
-    [Header("Scene References")]
-    [SerializeField] private Transform xrOriginRoot;
-    [SerializeField] private Transform xrCameraTransform;
-    [SerializeField] private Transform sellerBodyRoot;
-    [SerializeField] private Transform titlePosition;
-    [SerializeField] private Transform sellerStartPosition;
-    [SerializeField] private GameObject menuBoardRoot;
-    [SerializeField] private GameObject customerRoot;
+    [Header("UI")]
     [SerializeField] private UI_GameEnd uiGameEnd;
 
     [Header("Time")]
     [SerializeField, Min(1f)] private float gameDuration = 60f;
     [SerializeField, Min(1f)] private float preparationDuration = 15f;
 
-    [Header("Fade")]
-    [SerializeField] private FadeCanvas fadeCanvas;
-    [SerializeField, Min(0f)] private float startFadeDuration = 0.5f;
-
-    [Header("Start Sequence")]
-    [SerializeField] private bool snapToTitlePositionOnAwake = true;
-
     private int lastNotifiedGameTimerSeconds = -1;
     private int lastNotifiedPreparationTimerSeconds = -1;
     private bool lastNotifiedPreparationVisibility;
-    private bool isStartSequenceRunning;
 
     public event Action<int> ScoreChanged;
     public event Action<int> GameTimerSecondsChanged;
@@ -75,73 +59,7 @@ public class GameFlowManager : MonoBehaviour
 
     private void Start()
     {
-        if (snapToTitlePositionOnAwake)
-            InitializeTitle();
-    }
-
-    private void Update()
-    {
-        if (!IsGameRunning || State == EGameState.Qte)
-            return;
-
-        ElapsedTime = Mathf.Min(gameDuration, ElapsedTime + Time.deltaTime);
-        NotifyTimerEvents();
-
-        if (ElapsedTime >= gameDuration)
-        {
-            CompleteGame();
-            return;
-        }
-
-        if (State != EGameState.Preparation)
-            return;
-
-        PreparationTimeRemaining = Mathf.Max(
-            0f,
-            PreparationTimeRemaining - Time.deltaTime);
-        NotifyTimerEvents();
-
-        if (PreparationTimeRemaining <= 0f)
-        {
-            GameOver("15초 안에 아이스크림과 콘을 준비하지 못했습니다.");
-        }
-    }
-
-    public void StartSinglePlayer()
-    {
-        StartSinglePlayerAsync().Forget();
-    }
-
-    public void RestartSinglePlayer()
-    {
-        RestartSinglePlayerAsync().Forget();
-    }
-
-    public void StartSinglePlayerImmediate()
-    {
-        if (!ValidateSingleGameStartReferences(requireFadeCanvas: false))
-            return;
-
-        PrepareSingleGameStart();
-        BeginSinglePlayer();
-    }
-
-    public void ReturnToTitle()
-    {
-        ReturnToTitleAsync().Forget();
-    }
-
-    public void InitializeTitle()
-    {
-        if (!ValidateTitleReferences())
-            return;
-
-        ResetGameDataForNewSession();
-        ResetSessionStateToIdle();
-        MoveXrOriginTo(titlePosition);
-        SetGameObjectActive(menuBoardRoot, true);
-        SetGameObjectActive(customerRoot, false);
-        GameSound.PlayBgm(EBgmSoundId.Title);
+        StartGameSession();
     }
 
     public bool CompletePreparation()
@@ -214,110 +132,31 @@ public class GameFlowManager : MonoBehaviour
             Instance = null;
     }
 
-    private void BeginSinglePlayer()
+    private void Update()
     {
-        Score = 0;
-        ElapsedTime = 0f;
-        PreparationTimeRemaining = preparationDuration;
-        EndReason = string.Empty;
-
-        ChangeState(EGameState.Preparation);
-        SetGameEndUiVisible(false);
-        NotifyHudEvents(forceTimer: true);
-        GameSound.PlayBgm(EBgmSoundId.Game);
-    }
-
-    private async UniTaskVoid StartSinglePlayerAsync()
-    {
-        if (State != EGameState.Idle || isStartSequenceRunning)
+        if (!IsGameRunning)
             return;
 
-        if (!ValidateSingleGameStartReferences(requireFadeCanvas: true))
-            return;
+        ElapsedTime = Mathf.Min(gameDuration, ElapsedTime + Time.deltaTime);
+        NotifyTimerEvents();
 
-        isStartSequenceRunning = true;
-
-        try
+        if (ElapsedTime >= gameDuration)
         {
-            await fadeCanvas.FadeOutAsync(startFadeDuration);
-
-            PrepareSingleGameStart();
-            BeginSinglePlayer();
-
-            await fadeCanvas.FadeInAsync(startFadeDuration);
-        }
-        finally
-        {
-            isStartSequenceRunning = false;
-        }
-    }
-
-    private async UniTaskVoid RestartSinglePlayerAsync()
-    {
-        if (isStartSequenceRunning)
-            return;
-
-        if (State != EGameState.Idle &&
-            State != EGameState.GameOver &&
-            State != EGameState.Cleared)
-        {
+            CompleteGame();
             return;
         }
 
-        if (!ValidateSingleGameStartReferences(requireFadeCanvas: false))
+        if (State != EGameState.Preparation)
             return;
 
-        isStartSequenceRunning = true;
+        PreparationTimeRemaining = Mathf.Max(
+            0f,
+            PreparationTimeRemaining - Time.deltaTime);
+        NotifyTimerEvents();
 
-        try
+        if (PreparationTimeRemaining <= 0f)
         {
-            if (fadeCanvas != null)
-                await fadeCanvas.FadeOutAsync(startFadeDuration);
-
-            PrepareSingleGameStart();
-            BeginSinglePlayer();
-
-            if (fadeCanvas != null)
-                await fadeCanvas.FadeInAsync(startFadeDuration);
-        }
-        finally
-        {
-            isStartSequenceRunning = false;
-        }
-    }
-
-    private async UniTaskVoid ReturnToTitleAsync()
-    {
-        if (isStartSequenceRunning)
-            return;
-
-        if (State == EGameState.Idle)
-        {
-            InitializeTitle();
-            return;
-        }
-
-        if (State != EGameState.GameOver && State != EGameState.Cleared)
-            return;
-
-        if (!ValidateTitleReferences())
-            return;
-
-        isStartSequenceRunning = true;
-
-        try
-        {
-            if (fadeCanvas != null)
-                await fadeCanvas.FadeOutAsync(startFadeDuration);
-
-            InitializeTitle();
-
-            if (fadeCanvas != null)
-                await fadeCanvas.FadeInAsync(startFadeDuration);
-        }
-        finally
-        {
-            isStartSequenceRunning = false;
+            GameOver("15초 안에 아이스크림과 콘을 준비하지 못했습니다.");
         }
     }
 
@@ -360,96 +199,18 @@ public class GameFlowManager : MonoBehaviour
         }
     }
 
-    private void PrepareSingleGameStart()
-    {
-        ResetGameDataForNewSession();
-        MoveXrOriginTo(sellerStartPosition);
-        SetGameObjectActive(menuBoardRoot, false);
-        SetGameObjectActive(customerRoot, true);
-    }
-
-    private void ResetGameDataForNewSession()
-    {
-        ConeQteController coneQteController = GetComponent<ConeQteController>();
-        if (coneQteController != null)
-        {
-            coneQteController.CancelQte();
-            coneQteController.ResetCustomerTotalClicks();
-        }
-
-        // TODO: Player 상위 스크립트가 생기면 그곳에서 플레이어 관련 초기화를 묶어서 처리한다.
-    }
-
-    private void ResetSessionStateToIdle()
+    private void StartGameSession()
     {
         Score = 0;
         ElapsedTime = 0f;
-        PreparationTimeRemaining = 0f;
+        PreparationTimeRemaining = preparationDuration;
         EndReason = string.Empty;
-        ChangeState(EGameState.Idle);
+
+        ChangeState(EGameState.Preparation);
         SetGameEndUiVisible(false);
         NotifyHudEvents(forceTimer: true);
-    }
-
-    private void MoveXrOriginTo(Transform targetPoint)
-    {
-        Transform referenceTransform = xrCameraTransform != null ? xrCameraTransform : xrOriginRoot;
-        float yawDelta = targetPoint.eulerAngles.y - referenceTransform.eulerAngles.y;
-        xrOriginRoot.Rotate(Vector3.up, yawDelta, Space.World);
-
-        if (sellerBodyRoot != null)
-            sellerBodyRoot.Rotate(Vector3.up, yawDelta, Space.World);
-
-        if (xrCameraTransform != null)
-        {
-            Vector3 rootToCameraOffset = xrOriginRoot.position - xrCameraTransform.position;
-            xrOriginRoot.position = targetPoint.position + rootToCameraOffset;
-        }
-        else
-        {
-            xrOriginRoot.position = targetPoint.position;
-        }
-    }
-
-    private bool ValidateTitleReferences()
-    {
-        bool isValid = true;
-        isValid &= ValidateRequiredReference(xrOriginRoot, nameof(xrOriginRoot));
-        isValid &= ValidateRequiredReference(xrCameraTransform, nameof(xrCameraTransform));
-        isValid &= ValidateRequiredReference(titlePosition, nameof(titlePosition));
-        isValid &= ValidateRequiredReference(menuBoardRoot, nameof(menuBoardRoot));
-        isValid &= ValidateRequiredReference(customerRoot, nameof(customerRoot));
-        return isValid;
-    }
-
-    private bool ValidateSingleGameStartReferences(bool requireFadeCanvas)
-    {
-        bool isValid = true;
-        isValid &= ValidateRequiredReference(xrOriginRoot, nameof(xrOriginRoot));
-        isValid &= ValidateRequiredReference(xrCameraTransform, nameof(xrCameraTransform));
-        isValid &= ValidateRequiredReference(sellerStartPosition, nameof(sellerStartPosition));
-        isValid &= ValidateRequiredReference(menuBoardRoot, nameof(menuBoardRoot));
-        isValid &= ValidateRequiredReference(customerRoot, nameof(customerRoot));
-
-        if (requireFadeCanvas)
-            isValid &= ValidateRequiredReference(fadeCanvas, nameof(fadeCanvas));
-
-        return isValid;
-    }
-
-    private bool ValidateRequiredReference(UnityEngine.Object target, string fieldName)
-    {
-        if (target != null)
-            return true;
-
-        Debug.LogError($"GameFlowManager의 `{fieldName}`가 인스펙터에 연결되어 있지 않습니다.", this);
-        return false;
-    }
-
-    private void SetGameObjectActive(GameObject targetObject, bool isActive)
-    {
-        if (targetObject != null)
-            targetObject.SetActive(isActive);
+        GameSound.PlayBgm(EBgmSoundId.Game);
+        Debug.Log("PlayerBGM EBgmSoundId.Game");
     }
 
     private void SetGameEndUiVisible(bool isVisible)

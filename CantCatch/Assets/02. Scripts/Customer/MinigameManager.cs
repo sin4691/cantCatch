@@ -43,7 +43,6 @@ public class MinigameManager : MonoBehaviour
 
         if (kb.gKey.wasPressedThisFrame)
         {
-            GameFlowManager.Instance?.StartSinglePlayer();
             GameFlowManager.Instance?.CompletePreparation();
         }
 

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UI_TitleMenu : MonoBehaviour
@@ -7,11 +8,13 @@ public class UI_TitleMenu : MonoBehaviour
     [SerializeField] private GameObject optionPanel;
     [SerializeField] private Slider bgmSlider;
     [SerializeField] private Slider sfxSlider;
+    [SerializeField] private string gameSceneName = "MainScene";
 
     private void Start()
     {
         ResetPanel();
         InitializeVolumeSliders();
+        GameSound.PlayBgm(EBgmSoundId.Title);
     }
 
     private void OnDestroy()
@@ -67,14 +70,13 @@ public class UI_TitleMenu : MonoBehaviour
     {
         GameSound.PlaySfx(ESfxSoundId.Click);
 
-        GameFlowManager gameFlowManager = GameFlowManager.Instance;
-        if (gameFlowManager == null)
+        if (string.IsNullOrWhiteSpace(gameSceneName))
         {
-            Debug.LogError("GameFlowManager.Instance를 찾을 수 없습니다.", this);
+            Debug.LogError("이동할 게임 씬 이름이 비어 있습니다.", this);
             return;
         }
 
-        gameFlowManager.StartSinglePlayer();
+        SceneManager.LoadScene(gameSceneName);
     }
 
     public void OnClickMultiStart()

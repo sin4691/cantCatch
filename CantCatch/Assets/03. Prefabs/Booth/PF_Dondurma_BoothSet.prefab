@@ -109,7 +109,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3391533287459756316, guid: de54dc5baf591e54cbd4386f8bf390f3, type: 3}
       propertyPath: m_Name
-      value: UI_GameOver
+      value: UI_GameEnd
       objectReference: {fileID: 0}
     - target: {fileID: 3391533287459756324, guid: de54dc5baf591e54cbd4386f8bf390f3, type: 3}
       propertyPath: m_Pivot.x

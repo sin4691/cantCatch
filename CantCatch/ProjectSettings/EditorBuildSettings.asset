@@ -5,12 +5,12 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/01. Scenes/DongChanScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/01. Scenes/JaeYoonScene.unity
-    guid: 47bdc6d305eb6fa4a9b90b3b4f0cc22f
+    path: Assets/01. Scenes/TitleScene.unity
+    guid: 09150e15ec0b75b4d9b15e12bcfe0c75
+  - enabled: 1
+    path: Assets/01. Scenes/MainScene.unity
+    guid: dd01972e300ebcd43b84441b113c0870
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 46ed27561bb6dc641957b3dcc876f83a, type: 2}

@@ -7,20 +7,6 @@ public class SoundManager : MonoBehaviour
     private const string BgmVolumePrefsKey = "BgmVolume";
     private const string SfxVolumePrefsKey = "SfxVolume";
 
-    [System.Serializable]
-    private class BgmSoundEntry
-    {
-        public EBgmSoundId soundId;
-        public AudioClip clip;
-    }
-
-    [System.Serializable]
-    private class SfxSoundEntry
-    {
-        public ESfxSoundId soundId;
-        public AudioClip clip;
-    }
-
     public static SoundManager Instance { get; private set; }
     public float BgmVolume => bgmVolume;
     public float SfxVolume => sfxVolume;
@@ -33,9 +19,8 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioSource bgmSource;
     [SerializeField, Min(1)] private int initialSfxSourceCount = 5;
 
-    [Header("Sound Clips")]
-    [SerializeField] private List<BgmSoundEntry> bgmClips = new();
-    [SerializeField] private List<SfxSoundEntry> sfxClips = new();
+    [Header("Sound Data")]
+    [SerializeField] private SoundDatabase soundDatabase;
 
     [Header("Volume")]
     [SerializeField, Range(0f, 1f)] private float bgmVolume = 1f;
@@ -43,9 +28,10 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private bool keepAliveBetweenScenes = true;
 
     private readonly List<AudioSource> sfxSources = new();
-    private readonly Dictionary<EBgmSoundId, AudioClip> bgmClipMap = new();
-    private readonly Dictionary<ESfxSoundId, AudioClip> sfxClipMap = new();
+    private readonly Dictionary<EBgmSoundId, BgmSoundEntry> bgmClipMap = new();
+    private readonly Dictionary<ESfxSoundId, SfxSoundEntry> sfxClipMap = new();
     private bool isInitialized;
+    private float currentBgmVolumeScale = 1f;
 
     private void Awake()
     {
@@ -79,16 +65,19 @@ public class SoundManager : MonoBehaviour
         if (!isInitialized)
             return;
 
-        if (!TryGetClip(bgmClipMap, soundId, out AudioClip clip, "BGM"))
+        if (!TryGetEntry(bgmClipMap, soundId, out BgmSoundEntry entry, "BGM"))
         {
             return;
         }
 
+        AudioClip clip = entry.clip;
         if (bgmSource.clip == clip && bgmSource.isPlaying)
             return;
 
         bgmSource.clip = clip;
         bgmSource.loop = loop;
+        currentBgmVolumeScale = entry.volumeScale;
+        bgmSource.volume = bgmVolume * currentBgmVolumeScale;
         bgmSource.Play();
     }
 
@@ -99,6 +88,7 @@ public class SoundManager : MonoBehaviour
 
         bgmSource.Stop();
         bgmSource.clip = null;
+        currentBgmVolumeScale = 1f;
     }
 
     public void PlaySfx(ESfxSoundId soundId)
@@ -106,13 +96,13 @@ public class SoundManager : MonoBehaviour
         if (!isInitialized)
             return;
 
-        if (!TryGetClip(sfxClipMap, soundId, out AudioClip clip, "SFX"))
+        if (!TryGetEntry(sfxClipMap, soundId, out SfxSoundEntry entry, "SFX"))
         {
             return;
         }
 
         AudioSource availableSfxSource = GetAvailableSfxSource();
-        availableSfxSource.PlayOneShot(clip);
+        availableSfxSource.PlayOneShot(entry.clip, entry.volumeScale);
     }
 
     public void SetBgmVolume(float volume)
@@ -121,7 +111,7 @@ public class SoundManager : MonoBehaviour
         PlayerPrefs.SetFloat(BgmVolumePrefsKey, bgmVolume);
 
         if (isInitialized && bgmSource != null)
-            bgmSource.volume = bgmVolume;
+            bgmSource.volume = bgmVolume * currentBgmVolumeScale;
     }
 
     public void SetSfxVolume(float volume)
@@ -171,7 +161,7 @@ public class SoundManager : MonoBehaviour
 
     private void ApplyVolumes()
     {
-        bgmSource.volume = bgmVolume;
+        bgmSource.volume = bgmVolume * currentBgmVolumeScale;
         SetSfxVolume(sfxVolume);
     }
 
@@ -179,6 +169,12 @@ public class SoundManager : MonoBehaviour
     {
         bgmClipMap.Clear();
         sfxClipMap.Clear();
+
+        if (soundDatabase == null)
+        {
+            Debug.LogError("SoundDatabase가 연결되어 있지 않습니다.", this);
+            return;
+        }
 
         FillBgmClipMap();
         FillSfxClipMap();
@@ -239,9 +235,10 @@ public class SoundManager : MonoBehaviour
 
     private void FillBgmClipMap()
     {
-        for (int i = 0; i < bgmClips.Count; i++)
+        IReadOnlyList<BgmSoundEntry> bgmEntries = soundDatabase.BgmEntries;
+        for (int i = 0; i < bgmEntries.Count; i++)
         {
-            BgmSoundEntry entry = bgmClips[i];
+            BgmSoundEntry entry = bgmEntries[i];
             if (entry == null || entry.soundId == EBgmSoundId.None || entry.clip == null)
                 continue;
 
@@ -251,15 +248,17 @@ public class SoundManager : MonoBehaviour
                 continue;
             }
 
-            bgmClipMap.Add(entry.soundId, entry.clip);
+            entry.volumeScale = Mathf.Clamp01(entry.volumeScale);
+            bgmClipMap.Add(entry.soundId, entry);
         }
     }
 
     private void FillSfxClipMap()
     {
-        for (int i = 0; i < sfxClips.Count; i++)
+        IReadOnlyList<SfxSoundEntry> sfxEntries = soundDatabase.SfxEntries;
+        for (int i = 0; i < sfxEntries.Count; i++)
         {
-            SfxSoundEntry entry = sfxClips[i];
+            SfxSoundEntry entry = sfxEntries[i];
             if (entry == null || entry.soundId == ESfxSoundId.None || entry.clip == null)
                 continue;
 
@@ -269,17 +268,18 @@ public class SoundManager : MonoBehaviour
                 continue;
             }
 
-            sfxClipMap.Add(entry.soundId, entry.clip);
+            entry.volumeScale = Mathf.Clamp01(entry.volumeScale);
+            sfxClipMap.Add(entry.soundId, entry);
         }
     }
 
-    private bool TryGetClip(
-        Dictionary<EBgmSoundId, AudioClip> clipMap,
+    private bool TryGetEntry(
+        Dictionary<EBgmSoundId, BgmSoundEntry> clipMap,
         EBgmSoundId soundId,
-        out AudioClip clip,
+        out BgmSoundEntry entry,
         string categoryName)
     {
-        clip = null;
+        entry = null;
 
         if (soundId == EBgmSoundId.None)
         {
@@ -287,20 +287,20 @@ public class SoundManager : MonoBehaviour
             return false;
         }
 
-        if (clipMap.TryGetValue(soundId, out clip))
+        if (clipMap.TryGetValue(soundId, out entry))
             return true;
 
         Debug.LogWarning($"{categoryName}에 `{soundId}`가 등록되어 있지 않습니다.", this);
         return false;
     }
 
-    private bool TryGetClip(
-        Dictionary<ESfxSoundId, AudioClip> clipMap,
+    private bool TryGetEntry(
+        Dictionary<ESfxSoundId, SfxSoundEntry> clipMap,
         ESfxSoundId soundId,
-        out AudioClip clip,
+        out SfxSoundEntry entry,
         string categoryName)
     {
-        clip = null;
+        entry = null;
 
         if (soundId == ESfxSoundId.None)
         {
@@ -308,7 +308,7 @@ public class SoundManager : MonoBehaviour
             return false;
         }
 
-        if (clipMap.TryGetValue(soundId, out clip))
+        if (clipMap.TryGetValue(soundId, out entry))
             return true;
 
         Debug.LogWarning($"{categoryName}에 `{soundId}`가 등록되어 있지 않습니다.", this);

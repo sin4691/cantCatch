@@ -114,6 +114,7 @@ public class MinigameManager : MonoBehaviour
         if (!IsActive) return;
         IsActive = false;
         onSellerWin.Invoke();
+        GameSound.PlaySfx(ESfxSoundId.MiniGameWin);
         Debug.Log("판매자 승리", this);
         ClearState();
     }

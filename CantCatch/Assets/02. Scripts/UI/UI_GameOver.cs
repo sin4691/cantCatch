@@ -4,6 +4,8 @@ public class UI_GameOver : MonoBehaviour
 {
     public void OnClickReStart()
     {
+        GameSound.PlaySfx(ESfxSoundId.Click);
+
         GameFlowManager gameFlowManager = GameFlowManager.Instance;
         if (gameFlowManager == null)
         {
@@ -16,6 +18,8 @@ public class UI_GameOver : MonoBehaviour
 
     public void OnClickTitle()
     {
+        GameSound.PlaySfx(ESfxSoundId.Click);
+
         GameFlowManager gameFlowManager = GameFlowManager.Instance;
         if (gameFlowManager == null)
         {

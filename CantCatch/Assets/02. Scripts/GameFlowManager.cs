@@ -68,12 +68,15 @@ public class GameFlowManager : MonoBehaviour
 
         SetGameOverUiVisible(false);
 
-        if (snapToTitlePositionOnAwake)
-            InitializeTitle();
-
         lastNotifiedGameTimerSeconds = GameTimeRemainingSeconds;
         lastNotifiedPreparationTimerSeconds = PreparationTimeRemainingSeconds;
         lastNotifiedPreparationVisibility = ShouldShowPreparationTimer;
+    }
+
+    private void Start()
+    {
+        if (snapToTitlePositionOnAwake)
+            InitializeTitle();
     }
 
     private void Update()
@@ -138,6 +141,7 @@ public class GameFlowManager : MonoBehaviour
         MoveXrOriginTo(titlePosition);
         SetGameObjectActive(menuBoardRoot, true);
         SetGameObjectActive(customerRoot, false);
+        GameSound.PlayBgm(EBgmSoundId.Title);
     }
 
     public bool CompletePreparation()
@@ -177,6 +181,10 @@ public class GameFlowManager : MonoBehaviour
 
         Score += amount;
         ScoreChanged?.Invoke(Score);
+
+        if (amount > 0)
+            GameSound.PlaySfx(ESfxSoundId.Score);
+
         Debug.Log($"점수: {Score}");
     }
 
@@ -188,6 +196,7 @@ public class GameFlowManager : MonoBehaviour
         EndReason = reason;
         ChangeState(EGameState.GameOver);
         SetGameOverUiVisible(true);
+        GameSound.PlaySfx(ESfxSoundId.Lose);
 
         Debug.LogError($"게임오버: {reason}");
     }
@@ -196,6 +205,7 @@ public class GameFlowManager : MonoBehaviour
     {
         EndReason = "60초 생존 성공";
         ChangeState(EGameState.Cleared);
+        GameSound.PlaySfx(ESfxSoundId.Win);
 
         Debug.Log($"게임 클리어: {Score}점");
     }
@@ -216,6 +226,7 @@ public class GameFlowManager : MonoBehaviour
         ChangeState(EGameState.Preparation);
         SetGameOverUiVisible(false);
         NotifyHudEvents(forceTimer: true);
+        GameSound.PlayBgm(EBgmSoundId.Game);
     }
 
     private async UniTaskVoid StartSinglePlayerAsync()
@@ -454,4 +465,5 @@ public class GameFlowManager : MonoBehaviour
 
         uiGameOverObject.SetActive(isVisible);
     }
+
 }

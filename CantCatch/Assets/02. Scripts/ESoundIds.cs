@@ -8,7 +8,12 @@ public enum EBgmSoundId
 public enum ESfxSoundId
 {
     None,
-    ButtonClick,
-    GameStart,
-    GameOver
+    Click,
+    Score,
+    Stick,
+    MiniGameButton,
+    MiniGameWin,
+    Lose,
+    Win,
+    MaleVoice
 }

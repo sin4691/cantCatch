@@ -70,6 +70,7 @@ public class StickIceCreamController : MonoBehaviour
 
         attachedIceCream.Initialize(this);
         NotifyServingStateChanged();
+        GameSound.PlaySfx(ESfxSoundId.Stick);
 
         Debug.Log("막대기에 아이스크림 생성");
         return true;
@@ -84,6 +85,7 @@ public class StickIceCreamController : MonoBehaviour
         AttachedCone attachedCone = currentCone.GetComponent<AttachedCone>();
         attachedCone.Initialize(this);
         NotifyServingStateChanged();
+        GameSound.PlaySfx(ESfxSoundId.Stick);
         GameFlowManager.Instance?.CompletePreparation();
 
         Debug.Log("아이스크림에 콘 생성");
@@ -125,6 +127,7 @@ public class StickIceCreamController : MonoBehaviour
             return false;
 
         rotationSkillRoutine = StartCoroutine(RotateServingRoutine(holdDuration));
+        GameSound.PlaySfx(ESfxSoundId.Stick);
         return true;
     }
 

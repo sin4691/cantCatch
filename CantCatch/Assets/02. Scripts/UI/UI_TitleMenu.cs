@@ -31,8 +31,8 @@ public class UI_TitleMenu : MonoBehaviour
 
     private void InitializeVolumeSliders()
     {
-        SoundManager soundManager = SoundManager.Instance;
-        if (soundManager == null)
+        if (!GameSound.TryGetBgmVolume(out float bgmVolume) ||
+            !GameSound.TryGetSfxVolume(out float sfxVolume))
         {
             Debug.LogWarning("SoundManager.Instance를 찾을 수 없어 볼륨 슬라이더를 초기화하지 못했습니다.", this);
             return;
@@ -40,14 +40,14 @@ public class UI_TitleMenu : MonoBehaviour
 
         if (bgmSlider != null)
         {
-            bgmSlider.SetValueWithoutNotify(soundManager.BgmVolume);
+            bgmSlider.SetValueWithoutNotify(bgmVolume);
             bgmSlider.onValueChanged.RemoveListener(OnChangedBgmVolume);
             bgmSlider.onValueChanged.AddListener(OnChangedBgmVolume);
         }
 
         if (sfxSlider != null)
         {
-            sfxSlider.SetValueWithoutNotify(soundManager.SfxVolume);
+            sfxSlider.SetValueWithoutNotify(sfxVolume);
             sfxSlider.onValueChanged.RemoveListener(OnChangedSfxVolume);
             sfxSlider.onValueChanged.AddListener(OnChangedSfxVolume);
         }
@@ -55,22 +55,18 @@ public class UI_TitleMenu : MonoBehaviour
 
     public void OnChangedBgmVolume(float value)
     {
-        if (SoundManager.Instance == null)
-            return;
-
-        SoundManager.Instance.SetBgmVolume(value);
+        GameSound.SetBgmVolume(value);
     }
 
     public void OnChangedSfxVolume(float value)
     {
-        if (SoundManager.Instance == null)
-            return;
-
-        SoundManager.Instance.SetSfxVolume(value);
+        GameSound.SetSfxVolume(value);
     }
 
     public void OnClickSingleStart()
     {
+        GameSound.PlaySfx(ESfxSoundId.Click);
+
         GameFlowManager gameFlowManager = GameFlowManager.Instance;
         if (gameFlowManager == null)
         {
@@ -88,17 +84,20 @@ public class UI_TitleMenu : MonoBehaviour
 
     public void OnClickOption()
     {
+        GameSound.PlaySfx(ESfxSoundId.Click);
         titlePanel.SetActive(false);
         optionPanel.SetActive(true);
     }
 
     public void OnClickBack()
     {
+        GameSound.PlaySfx(ESfxSoundId.Click);
         ResetPanel();
     }
 
     public void OnClickExit()
     {
+        GameSound.PlaySfx(ESfxSoundId.Click);
         // TODO 게임 종료
     }
 }

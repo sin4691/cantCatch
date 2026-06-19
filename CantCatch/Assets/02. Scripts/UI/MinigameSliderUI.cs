@@ -26,6 +26,13 @@ public class MinigameSliderUI : MonoBehaviour
     [SerializeField, Min(0f)] private float progressTweenSpeed = 8f;
     [SerializeField] private bool resetOnEnable = true;
 
+    [Header("Timer Tween")]
+    [SerializeField, Min(1f)] private float timerTextBaseScale = 1f;
+    [SerializeField, Min(1f)] private float timerTickScale = 1.15f;
+    [SerializeField, Min(1f)] private float timerFinalTickScale = 1.3f;
+    [SerializeField, Min(0f)] private float timerTickDuration = 0.18f;
+    [SerializeField] private Ease timerTickEase = Ease.OutBack;
+
     [Header("Debug")]
     [SerializeField] private bool enableKeyboardDebugInput;
     [SerializeField, Min(0f)] private float keyboardDebugSpeed = 1.5f;
@@ -41,8 +48,10 @@ public class MinigameSliderUI : MonoBehaviour
     private MinigameSliderResult result = MinigameSliderResult.None;
     private Tween progressTween;
     private Tween timerTween;
+    private Tween timerTextTween;
     private CancellationTokenSource timerCts;
     private bool timerCompletedNaturally;
+    private int lastDisplayedTimerSecond = -1;
 
     public float TargetProgress => targetProgress;
     public float DisplayedProgress => displayedProgress;
@@ -71,6 +80,7 @@ public class MinigameSliderUI : MonoBehaviour
     {
         StopTimer();
         KillProgressTween();
+        KillTimerTextTween();
     }
 
     private void UpdateKeyboardDebugInput()
@@ -95,11 +105,13 @@ public class MinigameSliderUI : MonoBehaviour
     {
         StopTimer();
         KillProgressTween();
+        KillTimerTextTween();
 
         targetProgress = 0f;
         displayedProgress = 0f;
         timeRemainingSeconds = defaultDurationSeconds;
         result = MinigameSliderResult.None;
+        lastDisplayedTimerSecond = -1;
 
         RefreshVisuals();
     }
@@ -283,10 +295,14 @@ public class MinigameSliderUI : MonoBehaviour
         if (timerText == null)
             return;
 
-        int totalSeconds = Mathf.CeilToInt(Mathf.Max(0f, timeRemainingSeconds));
-        int minutes = totalSeconds / 60;
-        int seconds = totalSeconds % 60;
-        timerText.text = $"{minutes:00}:{seconds:00}";
+        int displaySeconds = Mathf.CeilToInt(Mathf.Max(0f, timeRemainingSeconds));
+        timerText.text = displaySeconds.ToString();
+
+        if (displaySeconds != lastDisplayedTimerSecond)
+        {
+            PlayTimerTickTween(displaySeconds);
+            lastDisplayedTimerSecond = displaySeconds;
+        }
     }
 
     private void KillProgressTween()
@@ -296,6 +312,49 @@ public class MinigameSliderUI : MonoBehaviour
             progressTween.Kill();
             progressTween = null;
         }
+    }
+
+    private void PlayTimerTickTween(int displaySeconds)
+    {
+        if (timerText == null)
+            return;
+
+        RectTransform timerRect = timerText.rectTransform;
+        if (timerRect == null)
+            return;
+
+        float targetScale = displaySeconds <= 3 ? timerFinalTickScale : timerTickScale;
+        Vector3 baseScale = Vector3.one * timerTextBaseScale;
+        Vector3 punchScale = Vector3.one * targetScale;
+
+        KillTimerTextTween();
+        timerRect.localScale = baseScale;
+
+        // 숫자가 바뀌는 순간마다 짧고 강하게 튀게 해서 힘겨루기 카운트다운 느낌을 준다.
+        timerTextTween = timerRect
+            .DOScale(punchScale, timerTickDuration)
+            .SetEase(timerTickEase)
+            .SetUpdate(true)
+            .OnComplete(() =>
+            {
+                timerTextTween = timerRect
+                    .DOScale(baseScale, timerTickDuration * 0.9f)
+                    .SetEase(Ease.OutQuad)
+                    .SetUpdate(true)
+                    .OnComplete(() => timerTextTween = null);
+            });
+    }
+
+    private void KillTimerTextTween()
+    {
+        if (timerTextTween != null)
+        {
+            timerTextTween.Kill();
+            timerTextTween = null;
+        }
+
+        if (timerText != null)
+            timerText.rectTransform.localScale = Vector3.one * timerTextBaseScale;
     }
 
     private float ResolveDuration(float durationSeconds)

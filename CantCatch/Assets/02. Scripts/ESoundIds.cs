@@ -15,5 +15,6 @@ public enum ESfxSoundId
     MiniGameWin,
     Lose,
     Win,
-    MaleVoice
+    MaleVoice,
+    MiniGameStart
 }

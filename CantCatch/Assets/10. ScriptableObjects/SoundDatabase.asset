@@ -22,25 +22,28 @@ MonoBehaviour:
   sfxEntries:
   - soundId: 1
     clip: {fileID: 8300000, guid: e828fbefc216d29458c867d2e2d07910, type: 3}
-    volumeScale: 1
+    volumeScale: 0.8
   - soundId: 2
     clip: {fileID: 8300000, guid: 7903b40a3ad7d34409948d69a11dd1c5, type: 3}
-    volumeScale: 0.5
+    volumeScale: 0.8
   - soundId: 3
     clip: {fileID: 8300000, guid: 8a0a446f02c418f428571d349fe7d352, type: 3}
-    volumeScale: 1
+    volumeScale: 0.8
   - soundId: 4
     clip: {fileID: 8300000, guid: 4e35c8bcedd951344ba59058f59314cd, type: 3}
-    volumeScale: 1
+    volumeScale: 0.8
   - soundId: 5
     clip: {fileID: 8300000, guid: 73c7aa16f106f3d44a255931900797e0, type: 3}
-    volumeScale: 1
+    volumeScale: 0.8
   - soundId: 6
     clip: {fileID: 8300000, guid: b8f0224786be8e04a8f6d78e9888dcca, type: 3}
-    volumeScale: 1
+    volumeScale: 0.8
   - soundId: 7
     clip: {fileID: 8300000, guid: 4c30a36955c03544ba9def8502d81646, type: 3}
-    volumeScale: 1
+    volumeScale: 0.8
   - soundId: 8
     clip: {fileID: 8300000, guid: 9bac18a44e350bf4e9c7b2bd1914b01f, type: 3}
+    volumeScale: 1
+  - soundId: 9
+    clip: {fileID: 8300000, guid: 5f2b6af83ddecac4a84aa7a9c69d8489, type: 3}
     volumeScale: 1

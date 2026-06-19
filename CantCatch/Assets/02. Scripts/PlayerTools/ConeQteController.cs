@@ -167,6 +167,7 @@ public class ConeQteController : MonoBehaviour
         customerMashCount = 0;
         qteTimeRemaining = qteDuration;
         phase = EQtePhase.Running;
+        GameSound.PlaySfx(ESfxSoundId.MiniGameStart);
     }
 
     private void UpdateQteSession()

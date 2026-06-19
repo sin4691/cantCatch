@@ -5785,7 +5785,7 @@ MonoBehaviour:
   gameFlowManager: {fileID: 0}
   coneReceivePoint: {fileID: 8352150334742464543}
   grabCooldown: 0.5
-  nearScoreInterval: 1
+  nearScoreInterval: 0.2
   nearScorePerInterval: 1
 --- !u!114 &8277544790450440712
 MonoBehaviour:
@@ -5937,6 +5937,9 @@ MonoBehaviour:
   headLookAt: {fileID: 1019676845017916146}
   grabPoint: {fileID: 0}
   ikTarget: {fileID: 368828282386740455}
+  nearZone: {fileID: 0}
+  receiveZone: {fileID: 0}
+  pinkyBone: {fileID: 0}
   winTriggerName: Win
   loseTriggerName: Throw
   throwDirection: {x: 0, y: 0.5, z: 1}
@@ -9658,7 +9661,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 455215fa83aab80418d70aa71f9c8e18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FollowTransform
-  target: {fileID: 0}
+  defaultTarget: {fileID: 0}
+  overrideTarget: {fileID: 0}
 --- !u!1 &4500594017889918760
 GameObject:
   m_ObjectHideFlags: 0
@@ -14355,7 +14359,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 455215fa83aab80418d70aa71f9c8e18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FollowTransform
-  target: {fileID: 0}
+  defaultTarget: {fileID: 0}
+  overrideTarget: {fileID: 0}
 --- !u!1 &7076595387769319115
 GameObject:
   m_ObjectHideFlags: 0

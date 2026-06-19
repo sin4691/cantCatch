@@ -13,17 +13,25 @@ public class CustomerBodyTracker : MonoBehaviour
 
     private Vector3 originPosition;
     private AttachedCone trackedCone;
+    private GameFlowManager gameFlowManager;
 
     private void Awake()
     {
         if (body == null)
             body = transform;
 
+        gameFlowManager = GameFlowManager.Instance;
         originPosition = body.position;
     }
 
     private void Update()
     {
+        if (!CanTrackCone())
+        {
+            trackedCone = null;
+            return;
+        }
+
         if (trackedCone == null)
         {
             trackedCone = FindAnyObjectByType<AttachedCone>();
@@ -34,6 +42,14 @@ public class CustomerBodyTracker : MonoBehaviour
             Vector3 targetPosition = GetTargetPosition();
             body.position = Vector3.MoveTowards(body.position, targetPosition, moveSpeed * Time.deltaTime);
         }
+    }
+
+    private bool CanTrackCone()
+    {
+        if (gameFlowManager == null)
+            gameFlowManager = GameFlowManager.Instance;
+
+        return gameFlowManager != null && gameFlowManager.State == EGameState.Playing;
     }
 
     private Vector3 GetTargetPosition()

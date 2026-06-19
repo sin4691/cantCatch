@@ -57,6 +57,17 @@ public class CustomerArmIK : MonoBehaviour
 
     private void Update()
     {
+        if (!CanTrackCone())
+        {
+            trackedCone = null;
+            IsAtMaxReach = false;
+
+            if (gameFlowManager == null || gameFlowManager.State != EGameState.Qte)
+                SetIKActive(false);
+
+            return;
+        }
+
         if (!trackingEnabled)
             return;
 
@@ -80,6 +91,14 @@ public class CustomerArmIK : MonoBehaviour
 
         ikTarget.position = Vector3.MoveTowards(ikTarget.position, clampedTarget, currentSpeed * Time.deltaTime);
 
+    }
+
+    private bool CanTrackCone()
+    {
+        if (gameFlowManager == null)
+            gameFlowManager = GameFlowManager.Instance;
+
+        return gameFlowManager != null && gameFlowManager.State == EGameState.Playing;
     }
 
     private Vector3 ClampTarget(Vector3 worldTarget)

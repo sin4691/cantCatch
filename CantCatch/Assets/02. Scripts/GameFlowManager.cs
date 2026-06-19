@@ -113,7 +113,8 @@ public class GameFlowManager : MonoBehaviour
         SetGameEndUiVisible(true);
         GameSound.PlaySfx(ESfxSoundId.Lose);
 
-        Debug.LogError($"게임오버: {reason}");
+        //Debug.LogError($"게임오버: {reason}");
+        Debug.Log($"게임오버: {reason}");
     }
 
     private void CompleteGame()

@@ -23,6 +23,15 @@ public class CustomerAIInput : MonoBehaviour
 
     private void Update()
     {
+        GameFlowManager gameFlowManager = GameFlowManager.Instance;
+        if (gameFlowManager == null ||
+            (gameFlowManager.State != EGameState.Playing && gameFlowManager.State != EGameState.Qte))
+        {
+            startTimer = 0f;
+            mashTimer = 0f;
+            return;
+        }
+
         var mgr = MinigameManager.Instance;
         if (mgr == null) return;
 

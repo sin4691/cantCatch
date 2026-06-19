@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8652895441192737035}
+  - component: {fileID: 5224040804322816784}
   m_Layer: 0
   m_Name: PF_IceCreamCone
   m_TagString: Untagged
@@ -32,6 +33,18 @@ Transform:
   - {fileID: 3670899737416833800}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5224040804322816784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6599723211016231504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4da66df9b734df5839960f3f17d7220, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttachedCone
 --- !u!1 &7382404370838753389
 GameObject:
   m_ObjectHideFlags: 0

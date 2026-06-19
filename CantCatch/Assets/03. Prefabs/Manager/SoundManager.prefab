@@ -50,8 +50,7 @@ MonoBehaviour:
   sfxRoot: {fileID: 2613707253132525691}
   bgmSource: {fileID: 4342640255461783538}
   initialSfxSourceCount: 5
-  bgmClips: []
-  sfxClips: []
+  soundDatabase: {fileID: 11400000, guid: 3b0edaae597830d4cb4aad3dd72f530f, type: 2}
   bgmVolume: 1
   sfxVolume: 1
   keepAliveBetweenScenes: 1

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UI_GameOver : MonoBehaviour
+public class UI_GameEnd : MonoBehaviour
 {
     public void OnClickReStart()
     {

@@ -15,7 +15,7 @@ public class GameFlowManager : MonoBehaviour
     [SerializeField] private Transform sellerStartPosition;
     [SerializeField] private GameObject menuBoardRoot;
     [SerializeField] private GameObject customerRoot;
-    [SerializeField] private UI_GameOver uiGameOver;
+    [SerializeField] private UI_GameEnd uiGameEnd;
 
     [Header("Time")]
     [SerializeField, Min(1f)] private float gameDuration = 60f;
@@ -66,7 +66,7 @@ public class GameFlowManager : MonoBehaviour
 
         Instance = this;
 
-        SetGameOverUiVisible(false);
+        SetGameEndUiVisible(false);
 
         lastNotifiedGameTimerSeconds = GameTimeRemainingSeconds;
         lastNotifiedPreparationTimerSeconds = PreparationTimeRemainingSeconds;
@@ -192,7 +192,7 @@ public class GameFlowManager : MonoBehaviour
 
         EndReason = reason;
         ChangeState(EGameState.GameOver);
-        SetGameOverUiVisible(true);
+        SetGameEndUiVisible(true);
         GameSound.PlaySfx(ESfxSoundId.Lose);
 
         Debug.LogError($"게임오버: {reason}");
@@ -202,6 +202,7 @@ public class GameFlowManager : MonoBehaviour
     {
         EndReason = "60초 생존 성공";
         ChangeState(EGameState.Cleared);
+        SetGameEndUiVisible(true);
         GameSound.PlaySfx(ESfxSoundId.Win);
 
         Debug.Log($"게임 클리어: {Score}점");
@@ -221,7 +222,7 @@ public class GameFlowManager : MonoBehaviour
         EndReason = string.Empty;
 
         ChangeState(EGameState.Preparation);
-        SetGameOverUiVisible(false);
+        SetGameEndUiVisible(false);
         NotifyHudEvents(forceTimer: true);
         GameSound.PlayBgm(EBgmSoundId.Game);
     }
@@ -386,7 +387,7 @@ public class GameFlowManager : MonoBehaviour
         PreparationTimeRemaining = 0f;
         EndReason = string.Empty;
         ChangeState(EGameState.Idle);
-        SetGameOverUiVisible(false);
+        SetGameEndUiVisible(false);
         NotifyHudEvents(forceTimer: true);
     }
 
@@ -451,16 +452,16 @@ public class GameFlowManager : MonoBehaviour
             targetObject.SetActive(isActive);
     }
 
-    private void SetGameOverUiVisible(bool isVisible)
+    private void SetGameEndUiVisible(bool isVisible)
     {
-        if (uiGameOver == null)
+        if (uiGameEnd == null)
             return;
 
-        GameObject uiGameOverObject = uiGameOver.gameObject;
-        if (uiGameOverObject.activeSelf == isVisible)
+        GameObject uiGameEndObject = uiGameEnd.gameObject;
+        if (uiGameEndObject.activeSelf == isVisible)
             return;
 
-        uiGameOverObject.SetActive(isVisible);
+        uiGameEndObject.SetActive(isVisible);
     }
 
 }

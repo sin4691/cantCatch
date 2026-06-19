@@ -7,6 +7,11 @@ public class CustomerMashGame : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private CustomerArmIK armIK;
     [SerializeField] private CustomerHeadLookAt headLookAt;
+    [SerializeField] private Transform grabPoint;
+    [SerializeField] private Transform ikTarget;
+    [SerializeField] private FollowTransform nearZone;
+    [SerializeField] private FollowTransform receiveZone;
+    [SerializeField] private Transform pinkyBone;
 
     [Header("Animation")]
     [SerializeField] private string winTriggerName = "Win";
@@ -30,7 +35,9 @@ public class CustomerMashGame : MonoBehaviour
     // MinigameManager.onMinigameStarted 에 연결
     public void OnMinigameStart()
     {
-        armIK?.Freeze();
+        if (grabPoint != null && ikTarget != null)
+            grabPoint.position = ikTarget.position;
+
         if (headLookAt != null) headLookAt.SetTrackingEnabled(false);
     }
 
@@ -38,6 +45,7 @@ public class CustomerMashGame : MonoBehaviour
     public void OnCustomerWin()
     {
         animator?.SetTrigger(winTriggerName);
+        SwitchZoneToPinky();
         GrabCone();
         DisableTracking();
     }
@@ -46,6 +54,7 @@ public class CustomerMashGame : MonoBehaviour
     public void OnSellerWin()
     {
         animator?.SetTrigger(loseTriggerName);
+        SwitchZoneToPinky();
         ThrowCone();
         DisableTracking();
     }
@@ -54,14 +63,13 @@ public class CustomerMashGame : MonoBehaviour
     {
         var mgr = MinigameManager.Instance;
         if (mgr?.PendingCone == null) return;
-        mgr.PendingCone.Stick?.TryLeaveCone(mgr.ReceivePoint);
+        mgr.PendingCone.Stick?.TryLeaveCone(grabPoint != null ? grabPoint : mgr.ReceivePoint);
     }
 
     private void ThrowCone()
     {
         var mgr = MinigameManager.Instance;
         if (mgr?.PendingCone == null) return;
-
         mgr.PendingCone.Stick?.TryLeaveCone(mgr.ReceivePoint);
         StartCoroutine(ApplyThrowForce(mgr.PendingCone));
     }
@@ -82,6 +90,12 @@ public class CustomerMashGame : MonoBehaviour
         Destroy(cone.gameObject, coneDestroyDelay);
     }
 
+    private void SwitchZoneToPinky()
+    {
+        nearZone?.SetOverrideTarget(pinkyBone);
+        receiveZone?.SetOverrideTarget(pinkyBone);
+    }
+
     private void DisableTracking()
     {
         armIK?.SetTrackingEnabled(false);
@@ -93,6 +107,8 @@ public class CustomerMashGame : MonoBehaviour
     {
         yield return new WaitForSeconds(trackingDisableDuration);
         armIK?.Unfreeze();
+        nearZone?.ResetToDefault();
+        receiveZone?.ResetToDefault();
         if (headLookAt != null) headLookAt.SetTrackingEnabled(true);
     }
 }

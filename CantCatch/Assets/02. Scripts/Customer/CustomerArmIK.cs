@@ -16,6 +16,13 @@ public class CustomerArmIK : MonoBehaviour
     [SerializeField, Min(0f)] private float maxReach = 1f;
     [SerializeField, Min(0f)] private float forwardOffset = 0.3f;
 
+    [Header("Arm Stretch")]
+    [SerializeField] private Transform upperArmBone;
+    [SerializeField] private Transform foreArmBone;
+    [SerializeField, Min(1f)] private float maxStretchScale = 1.5f;
+
+    [Header("Freeze Snap")]
+    [SerializeField] private Transform wristBone;
 
     public bool IsAtMaxReach { get; private set; }
 
@@ -91,6 +98,20 @@ public class CustomerArmIK : MonoBehaviour
 
         ikTarget.position = Vector3.MoveTowards(ikTarget.position, clampedTarget, currentSpeed * Time.deltaTime);
 
+        UpdateArmStretch();
+    }
+
+    private void UpdateArmStretch()
+    {
+        if (upperArmBone == null || foreArmBone == null)
+            return;
+
+        Vector3 localTarget = transform.InverseTransformPoint(ikTarget.position);
+        float reachRatio = Mathf.Clamp01(localTarget.magnitude / maxReach);
+        float stretchScale = Mathf.Lerp(1f, maxStretchScale, reachRatio);
+        Vector3 scale = new Vector3(stretchScale, 1f, 1f);
+        upperArmBone.localScale = scale;
+        foreArmBone.localScale = scale;
     }
 
     private bool CanTrackCone()
@@ -126,5 +147,11 @@ public class CustomerArmIK : MonoBehaviour
     {
         if (limbIK != null)
             limbIK.enabled = active;
+
+        if (!active && upperArmBone != null && foreArmBone != null)
+        {
+            upperArmBone.localScale = Vector3.one;
+            foreArmBone.localScale = Vector3.one;
+        }
     }
 }

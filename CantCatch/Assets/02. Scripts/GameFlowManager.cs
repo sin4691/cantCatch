@@ -105,6 +105,11 @@ public class GameFlowManager : MonoBehaviour
         StartSinglePlayerAsync().Forget();
     }
 
+    public void RestartSinglePlayer()
+    {
+        RestartSinglePlayerAsync().Forget();
+    }
+
     public void StartSinglePlayerImmediate()
     {
         if (!ValidateSingleGameStartReferences(requireFadeCanvas: false))
@@ -112,6 +117,11 @@ public class GameFlowManager : MonoBehaviour
 
         PrepareSingleGameStart();
         BeginSinglePlayer();
+    }
+
+    public void ReturnToTitle()
+    {
+        ReturnToTitleAsync().Forget();
     }
 
     public void InitializeTitle()
@@ -219,6 +229,75 @@ public class GameFlowManager : MonoBehaviour
             BeginSinglePlayer();
 
             await fadeCanvas.FadeInAsync(startFadeDuration);
+        }
+        finally
+        {
+            isStartSequenceRunning = false;
+        }
+    }
+
+    private async UniTaskVoid RestartSinglePlayerAsync()
+    {
+        if (isStartSequenceRunning)
+            return;
+
+        if (State != EGameState.Idle &&
+            State != EGameState.GameOver &&
+            State != EGameState.Cleared)
+        {
+            return;
+        }
+
+        if (!ValidateSingleGameStartReferences(requireFadeCanvas: false))
+            return;
+
+        isStartSequenceRunning = true;
+
+        try
+        {
+            if (fadeCanvas != null)
+                await fadeCanvas.FadeOutAsync(startFadeDuration);
+
+            PrepareSingleGameStart();
+            BeginSinglePlayer();
+
+            if (fadeCanvas != null)
+                await fadeCanvas.FadeInAsync(startFadeDuration);
+        }
+        finally
+        {
+            isStartSequenceRunning = false;
+        }
+    }
+
+    private async UniTaskVoid ReturnToTitleAsync()
+    {
+        if (isStartSequenceRunning)
+            return;
+
+        if (State == EGameState.Idle)
+        {
+            InitializeTitle();
+            return;
+        }
+
+        if (State != EGameState.GameOver && State != EGameState.Cleared)
+            return;
+
+        if (!ValidateTitleReferences())
+            return;
+
+        isStartSequenceRunning = true;
+
+        try
+        {
+            if (fadeCanvas != null)
+                await fadeCanvas.FadeOutAsync(startFadeDuration);
+
+            InitializeTitle();
+
+            if (fadeCanvas != null)
+                await fadeCanvas.FadeInAsync(startFadeDuration);
         }
         finally
         {

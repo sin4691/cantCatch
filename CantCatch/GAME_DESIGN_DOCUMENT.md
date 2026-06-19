@@ -331,3 +331,132 @@ QTE가 진행되는 동안에는 60초 게임 타이머가 정지하며, QTE가 
 ---
 
 문서 상태: 싱글플레이 우선·멀티플레이 후순위 게임 디자인 최신 정리본 / 코드 제외 버전
+
+---
+
+## 17. 2026-06-19 프로젝트 분석 반영
+
+이 섹션은 2026-06-19 현재 프로젝트 소스, 프리팹, 씬 연결을 기준으로 확인한 내용이다. 위쪽 본문은 기존 기획 기록으로 보존하고, 실제 구현 상태와 정리해야 할 차이는 이 섹션을 우선 기준으로 본다.
+
+### 17-1. 분석 기준과 범위
+
+- 기준 문서: `GAME_DESIGN_DOCUMENT.md`
+- 기준 코드: `Assets/02. Scripts`
+- 기준 입력 에셋: `Assets/InputSystem_Actions.inputactions`
+- 기준 주요 프리팹: `Assets/03. Prefabs/PlayerTools/PF_Dondurma_Stick.prefab`, `Assets/03. Prefabs/Custormer.prefab`, `Assets/03. Prefabs/Manager/GameFlowManager.prefab`, `Assets/03. Prefabs/Manager/Mini Game Manager.prefab`
+- 기준 주요 씬: `Assets/01. Scenes/MainScene.unity`, `Assets/01. Scenes/JaeYoonScene.unity`, `Assets/01. Scenes/DongChanScene.unity`
+- 이번 반영은 문서 분석 갱신이며, 스크립트, 프리팹, 씬, `ProjectSettings`, XR 설정은 변경하지 않는다.
+
+### 17-2. 현재 게임 플로우 구현 상태
+
+- `GameFlowManager`가 전체 게임 상태를 관리한다.
+- 상태 값은 `Idle`, `Preparation`, `Playing`, `Qte`, `GameOver`, `Cleared`이다.
+- 타이틀 상태에서는 XR Origin을 타이틀 위치로 이동시키고 메뉴 보드를 켜며 고객 루트를 끈다.
+- 싱글 플레이 시작 시 XR Origin을 판매자 시작 위치로 이동시키고 메뉴 보드를 끄며 고객 루트를 켠다.
+- 게임 시작 후 `Preparation` 상태로 진입하고 점수, 경과 시간, 준비 시간을 초기화한다.
+- 전체 제한 시간 기본값은 60초이다.
+- 준비 제한 시간 기본값은 15초이다.
+- `Preparation` 중 아이스크림과 콘이 모두 막대기에 붙으면 `Playing` 상태가 된다.
+- 준비 제한 시간이 0초가 될 때까지 준비가 끝나지 않으면 게임 오버가 된다.
+- 60초를 버티면 `Cleared` 상태가 되며 현재 점수가 최종 기록으로 남는다.
+- `GameFlowManager.Update()`는 `Qte` 상태에서는 전체 경과 시간을 누적하지 않는다. 따라서 `ConeQteController` 경로의 QTE는 60초 타이머를 멈춘다.
+- 현재 실제 호출되는 `MinigameManager` 슬라이더 미니게임은 `GameFlowManager.BeginQte()`를 호출하지 않는다. 따라서 이 경로에서는 60초 타이머 일시정지 규칙이 코드상 보장되지 않는다.
+
+### 17-3. 막대기, 아이스크림, 콘 준비 규칙
+
+- 막대기 핵심 로직은 `StickIceCreamController`가 담당한다.
+- 막대기는 `XRGrabInteractable`을 사용하며, `interactorsSelecting.Count >= 2`일 때 두 손으로 잡은 상태로 판단한다.
+- 아이스크림은 막대기가 두 손으로 잡힌 상태이고 아직 아이스크림이 없을 때만 붙일 수 있다.
+- 콘은 막대기가 두 손으로 잡힌 상태이고 아이스크림이 이미 붙어 있으며 아직 콘이 없을 때만 붙일 수 있다.
+- 아이스크림 부착 트리거는 태그 `IceCreamTub`을 확인한다.
+- 콘 부착 트리거는 태그 `ConeBox`를 확인한다.
+- 콘 프리팹에는 `AttachedCone`이 있어야 하며, 붙은 콘은 자신이 어느 `StickIceCreamController`에 속하는지 `Stick` 참조로 가진다.
+- 아이스크림 프리팹에는 필요 시 `AttachedIceCream`이 추가되고, 얼굴 슬로우 스킬의 대상 고객을 추적한다.
+- 콘을 고객에게 넘기는 처리는 `TryLeaveCone()`이 담당한다. 성공 시 콘은 막대기에서 분리되고 고객의 수령 위치로 이동하며 막대기에는 콘이 없는 상태가 된다.
+- 고객이 이기는 처리에서는 `TryDestroyCone()`으로 막대기에 붙은 콘을 파괴한다.
+
+### 17-4. 고객 손 판정과 점수
+
+- 고객 손 판정은 `CustomerHandSensor`와 `CustomerHandZone`이 담당한다.
+- 고객 손 영역은 `Near`와 `Receive` 두 종류로 나뉜다.
+- `CustomerHandZone`은 트리거에 들어온 오브젝트에서 부모 `AttachedCone`을 찾고, 해당 콘의 `Stick.HasCompleteServing`이 참일 때만 손 센서에 전달한다.
+- `Near` 영역 안에 완성된 콘이 있으면 기본값 기준 1초마다 1점을 얻는다.
+- `Receive` 영역 안에 완성된 콘이 있으면 고객이 콘을 잡는 미니게임을 시작할 수 있다.
+- 고객의 콘 잡기 재시도 쿨다운 기본값은 0.5초이다.
+- 180도 회전 회피 보너스는 같은 콘이 `Receive` 영역에 들어온 동안 한 번만 받을 수 있다.
+
+### 17-5. 고객 이동, 시선, 추적 구조
+
+- `CustomerController`는 고객의 `Waiting`, `Exiting` 상태를 관리한다.
+- 고객 대기 제한 시간 기본값은 10초이다.
+- 현재 본문에 있던 5초 대기 게임오버 규칙과 코드의 10초 고객 대기 타이머는 서로 다르므로 정리가 필요하다.
+- `CustomerArmIK`, `CustomerBodyTracker`, `CustomerHeadLookAt`은 현재 `FindAnyObjectByType<AttachedCone>()`로 씬의 임의 콘을 찾는다.
+- 이 구조는 콘이 여러 개 존재하거나, 향후 고객이 여러 명이 되는 상황에서 잘못된 콘을 추적할 수 있다.
+- 다음 구조 개선 시 고객이 추적할 콘을 명시적으로 주입하거나, 고객별 대상 콘 소유권을 분리해야 한다.
+
+### 17-6. 입력과 플레이어 스킬
+
+- `PlayerSkillController`가 플레이어 입력을 스킬 실행으로 연결한다.
+- 입력 액션 이름은 `Mash`, `RotateSkill`, `FaceSkill`이다.
+- `Mash`는 XR 기준 `<XRController>{RightHand}/primaryButton`에 연결되어 있다.
+- `RotateSkill`도 XR 기준 `<XRController>{RightHand}/primaryButton`에 연결되어 있다.
+- `FaceSkill`은 XR 기준 `<XRController>{RightHand}/triggerPressed`에 연결되어 있다.
+- `RotateSkill` 입력 중 `MinigameManager.IsActive`가 참이면 회전 스킬 대신 판매자 매시 입력으로 처리된다.
+- 180도 회전 스킬은 기본 1초 동안 Y축 기준으로 서빙 비주얼과 부착 지점을 회전시킨다.
+- 180도 회전 스킬 쿨다운 기본값은 1초이다.
+- 180도 회전 중 고객 `Receive` 영역의 콘을 회피하면 기본값 기준 5점을 얻는다.
+- 얼굴 아이스크림 묻히기 스킬은 한 게임당 기본 2회 사용할 수 있다.
+- 얼굴 스킬은 고객의 `CustomerSlowController`에 기본 3초 동안 50% 속도 배율을 적용한다.
+- 얼굴 스킬 쿨다운 기본값은 20초이다.
+
+### 17-7. QTE와 미니게임 구현 차이
+
+현재 프로젝트에는 콘 잡기 대결 로직이 두 갈래로 존재한다.
+
+1. `ConeQteController`
+   - `GameFlowManager.BeginQte()`를 호출해 게임 상태를 `Qte`로 바꾼다.
+   - 기본 QTE 시간은 5초이다.
+   - 판매자 매시 수와 고객 매시 수를 비교한다.
+   - 고객은 누적 콘 잡기 횟수에 따라 시작 보정을 받는다.
+   - 판매자가 이기면 콘을 고객 수령 위치에 넘기고 10점을 얻는다.
+   - 고객이 이기면 콘이 파괴되고 판매자는 10점을 잃는다.
+   - 무승부는 결과 없이 QTE를 종료한다.
+   - 이 경로에서는 `Qte` 상태 동안 전체 60초 타이머가 멈춘다.
+   - 현재 코드 검색 기준으로 `ConeQteController.TryStart()`를 직접 호출하는 경로는 확인되지 않는다.
+
+2. `MinigameManager`
+   - `CustomerAIInput`이 `CustomerHandSensor.TryStartMinigame()`을 주기적으로 호출하고, 여기서 `MinigameManager.StartMinigame()`이 실행된다.
+   - 기본 미니게임 시간은 10초이다.
+   - 슬라이더 진행값이 양수면 고객 승리, 음수면 판매자 승리, 0이면 결과 없이 종료된다.
+   - 고객 승리 시 `GameFlowManager.GameOver()`를 호출한다.
+   - 판매자 승리 시 코드 직접 처리 기준으로는 점수 추가, 콘 넘기기, 콘 제거가 명시되어 있지 않다. 필요한 처리는 UnityEvent 연결 여부를 추가 확인해야 한다.
+   - 이 경로는 `Qte` 상태로 들어가지 않으므로 60초 타이머 정지 규칙과 문서의 5초 QTE 규칙을 그대로 만족하지 않는다.
+
+정리 방향은 하나를 선택해야 한다. 현재 기획 문서의 규칙을 따르려면 고객 손 판정의 시작 경로를 `ConeQteController.TryStart()`로 통일하는 것이 맞다. 반대로 슬라이더 미니게임을 채택하려면 문서의 QTE 시간, 점수, 타이머 정지, 콘 처리 규칙을 `MinigameManager` 기준으로 다시 써야 한다.
+
+### 17-8. 현재 우선 구현 범위
+
+- 싱글 플레이 시작, 타이틀 복귀, 재시작 흐름
+- 60초 전체 타이머와 15초 준비 타이머
+- 준비 실패 게임오버
+- 아이스크림과 콘 부착
+- 두 손 잡기 조건
+- 고객 손 `Near` 점수
+- 고객 손 `Receive` 판정
+- 180도 회전 스킬과 회피 보너스
+- 얼굴 슬로우 스킬
+- 고객 AI의 미니게임 시작 시도와 매시 입력
+- 고객 팔 IK, 몸 이동, 머리 시선 추적
+- `ConeQteController` 기반 5초 QTE 컨트롤러
+- `MinigameManager` 기반 10초 슬라이더 미니게임
+
+### 17-9. 다음 정리 우선순위
+
+1. 콘 잡기 대결 경로를 `ConeQteController` 또는 `MinigameManager` 중 하나로 통일한다.
+2. 문서 기준 5초 QTE를 유지한다면 `CustomerHandSensor.TryStartMinigame()`이 `ConeQteController.TryStart()`를 호출하도록 구조를 정리한다.
+3. 슬라이더 미니게임을 유지한다면 전체 타이머 정지, 점수, 콘 넘기기, 고객 승리 결과를 문서 기준으로 다시 확정한다.
+4. `CustomerArmIK`, `CustomerBodyTracker`, `CustomerHeadLookAt`의 전역 `FindAnyObjectByType<AttachedCone>()` 사용을 고객별 명시 대상 참조로 교체한다.
+5. 고객 대기 시간 규칙을 문서의 5초 규칙으로 둘지, 현재 코드의 10초 `waitTimeout`으로 둘지 확정한다.
+6. 멀티플레이는 현재 우선순위가 낮으므로 싱글 플레이 규칙이 안정된 뒤 별도 섹션으로 다시 정리한다.
+
+문서 상태: 2026-06-19 현재 프로젝트 분석 결과 추가 반영. 기존 본문은 보존, 실제 구현 상태와 정리 필요 차이는 17장을 우선 기준으로 사용.

@@ -5058,6 +5058,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 348b53812d3cd0b42ae928013b58957a, type: 3}
+--- !u!114 &137527915 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3829412703479068404, guid: 348b53812d3cd0b42ae928013b58957a, type: 3}
+  m_PrefabInstance: {fileID: 137527914}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13374f58527cc60409763247ae92fee9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FadeCanvas
 --- !u!1001 &139436073
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42952,6 +42963,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6433360451759637887, guid: 29f49c4f87606ce47924a910b8793034, type: 3}
+      propertyPath: fadeCanvas
+      value: 
+      objectReference: {fileID: 137527915}
     - target: {fileID: 6541880411354757859, guid: 29f49c4f87606ce47924a910b8793034, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0

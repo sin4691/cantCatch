@@ -30944,7 +30944,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 958592611363100372, guid: 0d90ac6099bf6954aa904b317b433864, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.704
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1456987948758631351, guid: 0d90ac6099bf6954aa904b317b433864, type: 3}
       propertyPath: m_AnchorMax.y
@@ -31066,6 +31066,10 @@ PrefabInstance:
       propertyPath: gameFlowManager
       value: 
       objectReference: {fileID: 1527159035}
+    - target: {fileID: 4398156074146528068, guid: 0d90ac6099bf6954aa904b317b433864, type: 3}
+      propertyPath: fadeCanvas
+      value: 
+      objectReference: {fileID: 137527917}
     - target: {fileID: 4446260344091168251, guid: 0d90ac6099bf6954aa904b317b433864, type: 3}
       propertyPath: stickController
       value: 

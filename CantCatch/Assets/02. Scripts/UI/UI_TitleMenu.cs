@@ -8,13 +8,17 @@ public class UI_TitleMenu : MonoBehaviour
     [SerializeField] private GameObject optionPanel;
     [SerializeField] private Slider bgmSlider;
     [SerializeField] private Slider sfxSlider;
+    [SerializeField] private FadeCanvas fadeCanvas;
     [SerializeField] private string gameSceneName = "MainScene";
 
-    private void Start()
+    private async void Start()
     {
         ResetPanel();
         InitializeVolumeSliders();
         GameSound.PlayBgm(EBgmSoundId.Title);
+
+        if (fadeCanvas != null)
+            await fadeCanvas.FadeInAsync();
     }
 
     private void OnDestroy()
@@ -66,7 +70,7 @@ public class UI_TitleMenu : MonoBehaviour
         GameSound.SetSfxVolume(value);
     }
 
-    public void OnClickSingleStart()
+    public async void OnClickSingleStart()
     {
         GameSound.PlaySfx(ESfxSoundId.Click);
 
@@ -75,6 +79,9 @@ public class UI_TitleMenu : MonoBehaviour
             Debug.LogError("이동할 게임 씬 이름이 비어 있습니다.", this);
             return;
         }
+
+        if (fadeCanvas != null)
+            await fadeCanvas.FadeOutAsync();
 
         SceneManager.LoadScene(gameSceneName);
     }

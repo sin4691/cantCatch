@@ -61,6 +61,10 @@ public class MinigameManager : MonoBehaviour
         if (IsActive || cooldownRemaining > 0f || cone == null)
             return false;
 
+        GameFlowManager gameFlowManager = GameFlowManager.Instance;
+        if (gameFlowManager == null || !gameFlowManager.BeginQte())
+            return false;
+
         IsActive = true;
         PendingCone = cone;
         ReceivePoint = receivePoint;
@@ -122,6 +126,7 @@ public class MinigameManager : MonoBehaviour
     private void ClearState()
     {
         StopAllCoroutines();
+        GameFlowManager.Instance?.EndQte();
         PendingCone = null;
         ReceivePoint = null;
         cooldownRemaining = cooldownAfterGame;

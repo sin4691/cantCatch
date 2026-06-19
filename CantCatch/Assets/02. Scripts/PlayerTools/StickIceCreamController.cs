@@ -28,6 +28,9 @@ public class StickIceCreamController : MonoBehaviour
     private Vector3 coneAttachOriginalPosition;
     private Quaternion coneAttachOriginalRotation;
     private bool isConfigured;
+    private bool isQteMovementLocked;
+    private bool originalTrackPosition;
+    private bool originalTrackRotation;
 
     public bool HasIceCream => currentIceCream != null;
     public bool HasCone => currentCone != null;
@@ -57,9 +60,20 @@ public class StickIceCreamController : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        bool shouldLockMovement = GameFlowManager.Instance != null &&
+            GameFlowManager.Instance.State == EGameState.Qte;
+
+        if (shouldLockMovement == isQteMovementLocked)
+            return;
+
+        SetQteMovementLocked(shouldLockMovement);
+    }
+
     public bool TryAttachIceCream()
     {
-        if (!isConfigured || !IsHeldWithTwoHands || HasIceCream)
+        if (!CanModifyServing() || !isConfigured || !IsHeldWithTwoHands || HasIceCream)
             return false;
 
         currentIceCream = InstantiateAttached(iceCreamPrefab, iceCreamAttachPoint);
@@ -78,7 +92,7 @@ public class StickIceCreamController : MonoBehaviour
 
     public bool TryAttachCone()
     {
-        if (!isConfigured || !IsHeldWithTwoHands || !HasIceCream || HasCone)
+        if (!CanModifyServing() || !isConfigured || !IsHeldWithTwoHands || !HasIceCream || HasCone)
             return false;
 
         currentCone = InstantiateAttached(conePrefab, coneAttachPoint);
@@ -218,6 +232,34 @@ public class StickIceCreamController : MonoBehaviour
         coneAttachPoint.localRotation = coneAttachOriginalRotation;
     }
 
+    private bool CanModifyServing()
+    {
+        GameFlowManager gameFlowManager = GameFlowManager.Instance;
+        return gameFlowManager == null ||
+            gameFlowManager.State == EGameState.Preparation ||
+            gameFlowManager.State == EGameState.Playing;
+    }
+
+    private void SetQteMovementLocked(bool isLocked)
+    {
+        isQteMovementLocked = isLocked;
+
+        if (grabInteractable == null)
+            return;
+
+        if (isLocked)
+        {
+            originalTrackPosition = grabInteractable.trackPosition;
+            originalTrackRotation = grabInteractable.trackRotation;
+            grabInteractable.trackPosition = false;
+            grabInteractable.trackRotation = false;
+            return;
+        }
+
+        grabInteractable.trackPosition = originalTrackPosition;
+        grabInteractable.trackRotation = originalTrackRotation;
+    }
+
     private void SetCollidersEnabled(GameObject target, bool isEnabled)
     {
         Collider[] colliders = target.GetComponentsInChildren<Collider>(true);
@@ -289,6 +331,9 @@ public class StickIceCreamController : MonoBehaviour
 
     private void OnDisable()
     {
+        if (isQteMovementLocked)
+            SetQteMovementLocked(false);
+
         if (rotationSkillRoutine == null)
             return;
 

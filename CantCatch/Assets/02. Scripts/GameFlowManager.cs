@@ -10,6 +10,7 @@ public class GameFlowManager : MonoBehaviour
     [Header("Scene References")]
     [SerializeField] private Transform xrOriginRoot;
     [SerializeField] private Transform xrCameraTransform;
+    [SerializeField] private Transform sellerBodyRoot;
     [SerializeField] private Transform titlePosition;
     [SerializeField] private Transform sellerStartPosition;
     [SerializeField] private GameObject menuBoardRoot;
@@ -374,6 +375,9 @@ public class GameFlowManager : MonoBehaviour
         Transform referenceTransform = xrCameraTransform != null ? xrCameraTransform : xrOriginRoot;
         float yawDelta = targetPoint.eulerAngles.y - referenceTransform.eulerAngles.y;
         xrOriginRoot.Rotate(Vector3.up, yawDelta, Space.World);
+
+        if (sellerBodyRoot != null)
+            sellerBodyRoot.Rotate(Vector3.up, yawDelta, Space.World);
 
         if (xrCameraTransform != null)
         {

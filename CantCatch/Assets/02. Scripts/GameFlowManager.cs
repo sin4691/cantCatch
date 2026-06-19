@@ -15,6 +15,7 @@ public class GameFlowManager : MonoBehaviour
     [SerializeField] private Transform sellerStartPosition;
     [SerializeField] private GameObject menuBoardRoot;
     [SerializeField] private GameObject customerRoot;
+    [SerializeField] private UI_GameOver uiGameOver;
 
     [Header("Time")]
     [SerializeField, Min(1f)] private float gameDuration = 60f;
@@ -64,6 +65,8 @@ public class GameFlowManager : MonoBehaviour
         }
 
         Instance = this;
+
+        SetGameOverUiVisible(false);
 
         if (snapToTitlePositionOnAwake)
             InitializeTitle();
@@ -313,6 +316,7 @@ public class GameFlowManager : MonoBehaviour
 
         State = nextState;
 
+        SetGameOverUiVisible(State == EGameState.GameOver);
         NotifyTimerEvents(force: true);
         Debug.Log($"게임 상태: {State}");
     }
@@ -429,5 +433,17 @@ public class GameFlowManager : MonoBehaviour
     {
         if (targetObject != null)
             targetObject.SetActive(isActive);
+    }
+
+    private void SetGameOverUiVisible(bool isVisible)
+    {
+        if (uiGameOver == null)
+            return;
+
+        GameObject uiGameOverObject = uiGameOver.gameObject;
+        if (uiGameOverObject.activeSelf == isVisible)
+            return;
+
+        uiGameOverObject.SetActive(isVisible);
     }
 }

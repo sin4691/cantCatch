@@ -554,7 +554,7 @@ GameObject:
   - component: {fileID: 4402594151193732961}
   - component: {fileID: 3783258484828915781}
   m_Layer: 5
-  m_Name: MinMaxSlider
+  m_Name: SFXVolumeSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3581,7 +3581,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &8862429991832440441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3632,8 +3632,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UI_TitleMenu
   titlePanel: {fileID: 8553138365362781715}
   optionPanel: {fileID: 937945416998686451}
-  bgmSlider: {fileID: 0}
-  sfxSlider: {fileID: 0}
+  bgmSlider: {fileID: 7822333077597298637}
+  sfxSlider: {fileID: 4402594151193732961}
 --- !u!1 &9090044427464345637
 GameObject:
   m_ObjectHideFlags: 0
@@ -3703,7 +3703,7 @@ GameObject:
   - component: {fileID: 7822333077597298637}
   - component: {fileID: 2368066050893863619}
   m_Layer: 5
-  m_Name: MinMaxSlider
+  m_Name: BGMVolumeSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

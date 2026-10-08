@@ -73,3 +73,16 @@ crashlytics-build.properties
 **/[Aa]ssets/[Ss]treamingAssets/aa.meta
 **/[Aa]ssets/[Ss]treamingAssets/aa/*
 
+# 외부 에셋 (라이선스상 공개 저장소에서 제외)
+/CantCatch/Assets/German Town Stylized/
+/CantCatch/Assets/German Town Stylized.meta
+/CantCatch/Assets/HyTeKGames/
+/CantCatch/Assets/HyTeKGames.meta
+/CantCatch/Assets/Plugins/RootMotion/
+/CantCatch/Assets/Plugins/RootMotion.meta
+/CantCatch/Assets/Plugins/Demigiant/
+/CantCatch/Assets/Plugins/Demigiant.meta
+/CantCatch/Assets/SimplePoly City - Low Poly Assets/
+/CantCatch/Assets/SimplePoly City - Low Poly Assets.meta
+/CantCatch/Assets/polyperfect/
+/CantCatch/Assets/polyperfect.meta

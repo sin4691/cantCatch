@@ -38,3 +38,9 @@ XR Origin·OpenXR 세팅과 VRIK 전신 아바타는 코드가 아니라 씬·�
 ## 팀원 담당
 
 손이 닿았는지 판정, 연타 게이지 UI, 게임 흐름 관리는 팀원 작업입니다.
+
+## 외부 에셋
+
+사용한 에셋: Final IK, DOTween Pro, German Town Stylized, SimplePoly City, polyperfect Low Poly Animated People, SRP Material Converter.
+
+유료·스토어 에셋은 라이선스상 공개 저장소에 둘 수 없어서 저장소에서 뺐습니다. 그래서 받은 그대로는 씬의 모델·UI가 비어 보입니다. 코드는 모두 그대로 있습니다.
